@@ -153,9 +153,18 @@ export default function App() {
     const nDays = recent.length;
     const avgCals = nDays ? recent.reduce((s, f) => s + (f.calories || 0), 0) / nDays : null;
     const avgProt = nDays ? recent.reduce((s, f) => s + (f.protein || 0), 0) / nDays : null;
+    // carbs/fat: average only over days they were actually logged
+    const avgOver = (key) => {
+      const logged = recent.filter((f) => f[key] != null);
+      return logged.length ? logged.reduce((s, f) => s + f[key], 0) / logged.length : null;
+    };
+    const avgCarbs = avgOver("carbs");
+    const avgFat = avgOver("fat");
 
     const bw = latest?.weight ?? null;
     const proteinTarget = bw ? bw * nutriSettings.proteinPerKg : null;
+    // fat floor: 0.8 g/kg bodyweight (hormone/health minimum)
+    const fatFloor = bw ? bw * 0.8 : null;
 
     // weight trend over the last ~2 weeks (kg/week) from actual weigh-ins
     const twoWk = new Date(today);
@@ -197,6 +206,14 @@ export default function App() {
       else targetCals = tdee;
     }
 
+    // carb target = calories left after protein + fat, at the calorie target (protein/carbs 4 kcal/g, fat 9)
+    let carbTarget = null;
+    if (targetCals != null && proteinTarget != null && fatFloor != null) {
+      const fatForCalc = avgFat != null ? Math.max(avgFat, fatFloor) : fatFloor;
+      const remaining = targetCals - proteinTarget * 4 - fatForCalc * 9;
+      carbTarget = remaining > 0 ? remaining / 4 : 0;
+    }
+
     // recommendation
     let rec = null, recTone = "hold";
     if (avgCals != null && targetCals != null) {
@@ -220,6 +237,31 @@ export default function App() {
     if (avgProt != null && proteinTarget != null) {
       if (avgProt < proteinTarget - 5) { proteinNote = `Protein low: ${Math.round(avgProt)}g vs ${Math.round(proteinTarget)}g target. Raise it to protect muscle in a deficit.`; proteinOk = false; }
       else { proteinNote = `Protein on point: ${Math.round(avgProt)}g vs ${Math.round(proteinTarget)}g target.`; proteinOk = true; }
+    }
+
+    // fat flag: check against 0.8 g/kg floor
+    let fatNote = null, fatOk = true;
+    if (avgFat != null && fatFloor != null) {
+      if (avgFat < fatFloor - 3) { fatNote = `Fat low: ${Math.round(avgFat)}g vs ~${Math.round(fatFloor)}g minimum (0.8 g/kg). Very low fat over time can hurt hormones — bring it up.`; fatOk = false; }
+      else { fatNote = `Fat adequate: ${Math.round(avgFat)}g (floor ~${Math.round(fatFloor)}g).`; fatOk = true; }
+    }
+
+    // carb flag: compare to remaining-calorie target
+    let carbNote = null, carbOk = true;
+    if (avgCarbs != null && carbTarget != null) {
+      if (carbTarget < 50) { carbNote = `Your protein and fat targets leave little room for carbs (~${Math.round(carbTarget)}g). Fine short-term, but low carbs can flatten training — consider a small calorie bump or less fat.`; carbOk = false; }
+      else if (avgCarbs < carbTarget - 40) { carbNote = `Carbs on the low side: ${Math.round(avgCarbs)}g vs ~${Math.round(carbTarget)}g available. If training feels flat, shift some fat calories to carbs.`; carbOk = false; }
+      else { carbNote = `Carbs in range: ${Math.round(avgCarbs)}g vs ~${Math.round(carbTarget)}g available.`; carbOk = true; }
+    }
+
+    // sanity: do logged macros roughly match logged calories?
+    let macroMismatch = null;
+    if (avgProt != null && avgCarbs != null && avgFat != null && avgCals != null) {
+      const macroKcal = avgProt * 4 + avgCarbs * 4 + avgFat * 9;
+      const gap = Math.abs(macroKcal - avgCals);
+      if (gap > avgCals * 0.15) {
+        macroMismatch = `Your logged macros add up to ~${Math.round(macroKcal)} kcal but you logged ~${Math.round(avgCals)} kcal — a ${Math.round((gap / avgCals) * 100)}% gap. One of the numbers is likely off.`;
+      }
     }
 
     // ---------- data-driven insights ----------
@@ -298,7 +340,12 @@ export default function App() {
     }
     if (etas.length) insights.push({ tone: "info", text: `At your current rate: ${etas.join(", ")}.` });
 
-    return { nDays, avgCals, avgProt, proteinTarget, trendKgWk, trustTrend, tdee, tdeeMethod, targetCals, rec, recTone, proteinNote, proteinOk, insights, bw, recentWCount: recentW.length, rate: nutriSettings.rateKgWk, dir: nutriSettings.goalDir };
+    // 8. macro-specific insights
+    if (macroMismatch) insights.push({ tone: "warn", text: macroMismatch });
+    if (fatNote && !fatOk) insights.push({ tone: "warn", text: fatNote });
+    if (carbNote && !carbOk) insights.push({ tone: "warn", text: carbNote });
+
+    return { nDays, avgCals, avgProt, avgCarbs, avgFat, proteinTarget, fatFloor, carbTarget, fatNote, fatOk, carbNote, carbOk, trendKgWk, trustTrend, tdee, tdeeMethod, targetCals, rec, recTone, proteinNote, proteinOk, insights, bw, recentWCount: recentW.length, rate: nutriSettings.rateKgWk, dir: nutriSettings.goalDir };
   }, [foodLog, sorted, latest, nutriSettings, goals]);
 
   // ---------- body composition analysis (measured, BIA-aware, tape cross-checked) ----------
@@ -490,7 +537,8 @@ export default function App() {
   const saveFood = () => {
     if (foodDraft.calories == null || foodDraft.calories === "") { alert("Calories are required."); return; }
     const date = foodDraft.date || new Date().toISOString().slice(0, 10);
-    const entry = { id: Date.now(), date, calories: Number(foodDraft.calories), protein: foodDraft.protein === "" || foodDraft.protein == null ? null : Number(foodDraft.protein) };
+    const num = (v) => (v === "" || v == null ? null : Number(v));
+    const entry = { id: Date.now(), date, calories: Number(foodDraft.calories), protein: num(foodDraft.protein), carbs: num(foodDraft.carbs), fat: num(foodDraft.fat) };
     // replace same-date entry if exists, else add
     setFoodLog((log) => {
       const others = log.filter((f) => f.date !== date);
@@ -677,6 +725,20 @@ export default function App() {
             {nutrition.proteinNote && <div className="protnote">{nutrition.proteinNote}</div>}
           </div>
 
+          <div className="macrogrid">
+            <div className={`macro ${nutrition.carbOk ? "" : "low"}`}>
+              <div className="macronum">{nutrition.avgCarbs != null ? Math.round(nutrition.avgCarbs) : "—"}<span>g</span></div>
+              <div className="macrolab">carbs <small>/ {nutrition.carbTarget != null ? Math.round(nutrition.carbTarget) : "—"}g</small></div>
+            </div>
+            <div className={`macro ${nutrition.fatOk ? "" : "low"}`}>
+              <div className="macronum">{nutrition.avgFat != null ? Math.round(nutrition.avgFat) : "—"}<span>g</span></div>
+              <div className="macrolab">fat <small>/ ≥{nutrition.fatFloor != null ? Math.round(nutrition.fatFloor) : "—"}g</small></div>
+            </div>
+          </div>
+
+          {nutrition.fatNote && <div className={`macronote ${nutrition.fatOk ? "ok" : "low"}`}>{nutrition.fatNote}</div>}
+          {nutrition.carbNote && <div className={`macronote ${nutrition.carbOk ? "ok" : "low"}`}>{nutrition.carbNote}</div>}
+
           {nutrition.tdeeMethod === "estimated" && (
             <div className="notecard">Maintenance is a formula estimate right now. Once you have 2+ weigh-ins spanning several days in the same week you log food, it switches to a measured value based on your actual weight trend — far more accurate.</div>
           )}
@@ -687,7 +749,10 @@ export default function App() {
               <div key={f.id} className="foodrow">
                 <span className="fdate">{f.date.slice(5)}</span>
                 <span className="fcal">{f.calories} kcal</span>
-                <span className="fprot">{f.protein != null ? `${f.protein}g P` : "—"}</span>
+                <span className="fmacros">
+                  {f.protein != null ? `${f.protein}P` : ""}{f.carbs != null ? ` ${f.carbs}C` : ""}{f.fat != null ? ` ${f.fat}F` : ""}
+                  {f.protein == null && f.carbs == null && f.fat == null ? "—" : ""}
+                </span>
               </div>
             ))}
             {foodLog.length === 0 && <div className="empty" style={{ padding: "30px 0" }}>No calories logged yet.</div>}
@@ -854,8 +919,21 @@ export default function App() {
               </div>
             </div>
 
+            <div className="detblock">
+              <div className="detlabel">6 · Fat &amp; carbs</div>
+              <div className="detbody">
+                {nutrition.fatFloor == null ? "Needs your current weight." : (
+                  <>
+                    Fat floor is <span className="mono">{fmt(nutrition.bw)} kg × 0.8 = {Math.round(nutrition.fatFloor)}g/day</span> — the minimum for hormone health. Carbs are whatever calories remain after protein and fat:
+                    <br /><span className="mono">({Math.round(nutrition.targetCals || 0)} − {Math.round(nutrition.proteinTarget || 0)}×4 − {Math.round(nutrition.fatFloor)}×9) ÷ 4 ≈ {nutrition.carbTarget != null ? Math.round(nutrition.carbTarget) : "—"}g</span>
+                    <br />{nutrition.fatNote} {nutrition.carbNote}
+                  </>
+                )}
+              </div>
+            </div>
+
             <div className="detnote">
-              What this can't do: predict how much of a change will be fat vs. muscle from calories alone. That depends on training, sleep, and genetics. Recommendations here are built on your weight trend and protein — the parts the data can actually measure.
+              What this can't do: predict how much of a change will be fat vs. muscle from calories alone. That depends on training, sleep, and genetics. Recommendations here are built on your weight trend and macros — the parts the data can actually measure.
             </div>
           </div>
         </div>
@@ -881,6 +959,16 @@ export default function App() {
               <span>Protein <small>g</small></span>
               <input type="number" inputMode="decimal" value={foodDraft.protein ?? ""} onChange={(e) => setFoodDraft({ ...foodDraft, protein: e.target.value })} />
             </label>
+            <div className="tapegrid">
+              <label className="fld">
+                <span>Carbs <small>g</small></span>
+                <input type="number" inputMode="decimal" value={foodDraft.carbs ?? ""} onChange={(e) => setFoodDraft({ ...foodDraft, carbs: e.target.value })} />
+              </label>
+              <label className="fld">
+                <span>Fat <small>g</small></span>
+                <input type="number" inputMode="decimal" value={foodDraft.fat ?? ""} onChange={(e) => setFoodDraft({ ...foodDraft, fat: e.target.value })} />
+              </label>
+            </div>
             <p className="hint" style={{ marginBottom: 12 }}>Logging the same date again overwrites it — enter your daily total.</p>
             <button className="save" onClick={saveFood}>Save day</button>
           </div>
@@ -1068,12 +1156,21 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .protrow strong { font-weight:680; }
 .protrow small { color:var(--dim); font-weight:500; }
 .protnote { font-size:12.5px; color:var(--dim); margin-top:8px; line-height:1.4; }
+.macrogrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.macro { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px 16px; }
+.macro.low { border-color:#7a5a2b; }
+.macronum { font-size:24px; font-weight:680; letter-spacing:-.02em; }
+.macronum span { font-size:14px; color:var(--dim); font-weight:500; margin-left:2px; }
+.macrolab { font-size:12.5px; color:var(--dim); margin-top:2px; }
+.macrolab small { color:#4a525e; }
+.macronote { font-size:12.5px; line-height:1.45; color:var(--dim); border-radius:12px; padding:11px 14px; margin-bottom:10px; border:1px solid var(--line); background:var(--panel); }
+.macronote.low { border-color:#5a4a2b; }
 .notecard { font-size:12.5px; color:var(--dim); line-height:1.5; background:var(--panel); border:1px dashed var(--line); border-radius:14px; padding:12px 14px; margin-bottom:14px; }
 .foodlist { display:flex; flex-direction:column; gap:6px; }
-.foodrow { display:flex; justify-content:space-between; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:14px; }
-.fdate { color:var(--dim); font-weight:600; }
-.fcal { font-weight:650; }
-.fprot { color:var(--dim); }
+.foodrow { display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:14px; }
+.fdate { color:var(--dim); font-weight:600; flex:none; }
+.fcal { font-weight:650; margin-left:auto; }
+.fmacros { color:var(--dim); font-size:12.5px; flex:none; font-variant-numeric:tabular-nums; }
 .segrow { display:flex; gap:6px; }
 .seg { flex:1; border:1px solid var(--line); background:var(--bg); color:var(--dim); font-size:13px; font-weight:600; padding:11px 0; border-radius:11px; text-transform:capitalize; }
 .seg.on { background:#5aa9e6; color:#06121e; border-color:#5aa9e6; }
