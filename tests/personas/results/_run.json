@@ -80,10 +80,11 @@
       "attempts": 0
     },
     "p16": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.307Z",
-      "agent": "abfbe8f542cc246d2"
+      "agent": "abfbe8f542cc246d2",
+      "finishedAt": "2026-09-26T21:13:01.832Z"
     },
     "p17": {
       "status": "pending",
@@ -474,6 +475,18 @@
     {
       "at": "2026-09-26T21:11:41.326Z",
       "note": "21:13 decision: launch gate switched from 1-min load average (<3.2) to measured CPU idle over 30s (vmstat). Load average counts bursty Chromium/node threads and stayed 6-7 even with ~30% CPU idle; ~20% headroom is kept by launching only when idle >= 30% (one agent costs ~10-12% CPU). p04 launched at idle 28-35% with 6 running."
+    },
+    {
+      "at": "2026-09-26T21:13:01.832Z",
+      "id": "p16",
+      "set": [
+        "status=completed",
+        "finishedAt=now"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:13:01.921Z",
+      "note": "p16 note: persona's own helper script skipped day 15 (persona-side slip, not app); kept as a realistic missed day."
     }
   ]
 }
