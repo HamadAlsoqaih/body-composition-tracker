@@ -145,3 +145,25 @@ export function energyPerKgFor(bfInfo) {
   const h = hallForbesEnergyPerKg(bfInfo?.fatMass);
   return { ...h, fatMass: bfInfo?.fatMass ?? null, bfPercent: bfInfo?.bfPercent ?? null, source: h.fallback ? "fallback 7700" : bfInfo.source, isEstimate: !!bfInfo?.isEstimate };
 }
+
+/**
+ * energyPerKg for each day of a filter run, recomputed weekly (days 0, 7, 14…
+ * from the start) from the body-fat estimate available on that date and the
+ * trend weight on that date.
+ * trendAtDate(date) → kg; person = {heightCm, age, sex}; readings = [{date, bf, source}]
+ */
+export function energyPerKgSchedule({ dates, readings, trendAtDate, person }) {
+  const rho = new Array(dates.length);
+  const weeks = [];
+  let cur = null;
+  for (let i = 0; i < dates.length; i++) {
+    if (i % 7 === 0) {
+      const w = trendAtDate(dates[i]);
+      const bf = bodyFatEstimate({ readings, date: dates[i], weightKg: w, ...person });
+      cur = { date: dates[i], weightKg: w, ...energyPerKgFor(bf), bfSource: bf.source };
+      weeks.push(cur);
+    }
+    rho[i] = cur.energyPerKg;
+  }
+  return { rho, weeks };
+}
