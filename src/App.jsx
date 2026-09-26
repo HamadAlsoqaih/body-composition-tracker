@@ -19,6 +19,7 @@ import NutritionSettingsSheet from "./components/NutritionSettingsSheet.jsx";
 import ChartSheet from "./components/ChartSheet.jsx";
 import BodyAnalysisSheet from "./components/BodyAnalysisSheet.jsx";
 import DataSheet from "./components/DataSheet.jsx";
+import WhatsNew from "./components/WhatsNew.jsx";
 
 const COMPOSITION = [
   { key: "weight", label: "Weight", kind: "mass", goodDir: "down" },
@@ -48,7 +49,8 @@ export default function App() {
 
   const [tab, setTab] = useState("body");
   const [baseMode, setBaseMode] = useState("first");
-  const [sheet, setSheet] = useState(() => (!settings.profilePrompted ? { type: "welcome" } : null));
+  // returning users see "What's new" once (instead of the first-run welcome)
+  const [sheet, setSheet] = useState(() => (state.meta.showWhatsNew ? { type: "whatsnew" } : !settings.profilePrompted ? { type: "welcome" } : null));
   const open = (type, extra = {}) => setSheet({ type, ...extra });
   const close = () => setSheet(null);
 
@@ -98,6 +100,14 @@ export default function App() {
   return (
     <div className="app">
       <style>{css}</style>
+
+      {sheet?.type === "whatsnew" && (
+        <WhatsNew
+          needsProfile={settings.legacyReview || profileIncomplete}
+          onClose={() => { actions.dismissWhatsNew(); close(); }}
+          onReviewProfile={() => { actions.dismissWhatsNew(); open("profile"); }}
+        />
+      )}
 
       {sheet?.type === "welcome" && (
         <div className="welcome" onClick={closeWelcomeOrProfile}>

@@ -91,6 +91,8 @@ export function useAppState() {
         }),
       replaceState: (next) => update(() => next),
       markBackup: (date) => update((s) => ({ ...s, meta: { ...s.meta, lastBackupAt: date } })),
+      dismissWhatsNew: () =>
+        update((s) => ({ ...s, meta: { ...s.meta, showWhatsNew: false }, settings: { ...s.settings, profilePrompted: true } })),
       dismissBackupReminder: (date) => update((s) => ({ ...s, meta: { ...s.meta, backupReminderDismissedAt: date } })),
       clearCorrupt: (key) => {
         try {

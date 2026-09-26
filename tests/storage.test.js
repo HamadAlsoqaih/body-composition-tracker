@@ -209,3 +209,24 @@ describe("schema v3: weight-only entries have no source", () => {
     expect("source" in v.state.entries[0]).toBe(false);
   });
 });
+
+describe("one-time 'What's new' for returning users", () => {
+  it("is flagged when an earlier version's data with entries or food is migrated", () => {
+    const { state } = loadState(memStorage(V1), "2026-09-01");
+    expect(state.meta.showWhatsNew).toBe(true);
+  });
+  it("is not flagged for new users or old installs with no data", () => {
+    expect(loadState(memStorage({}), "2026-09-01").state.meta.showWhatsNew).toBe(false);
+    const openedOnly = { bt_entries: "[]", bt_food: "[]", bt_goals: JSON.stringify({ weight: null }), bt_settings: JSON.stringify({ goalDir: "lose", height: 175 }) };
+    expect(loadState(memStorage(openedOnly), "2026-09-01").state.meta.showWhatsNew).toBe(false);
+  });
+  it("survives a reload until dismissed, then never shows again", () => {
+    const st = memStorage(V1);
+    const first = loadState(st, "2026-09-01").state;
+    saveState(st, first);
+    const second = loadState(st, "2026-09-02").state;
+    expect(second.meta.showWhatsNew).toBe(true); // tab closed before dismissing → still pending
+    saveState(st, { ...second, meta: { ...second.meta, showWhatsNew: false } });
+    expect(loadState(st, "2026-09-03").state.meta.showWhatsNew).toBe(false);
+  });
+});

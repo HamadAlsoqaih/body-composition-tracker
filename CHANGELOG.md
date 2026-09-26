@@ -8,6 +8,10 @@
 - **Deploys ran without tests.** The GitHub Pages workflow now runs `npm test` after `npm ci` and before `npm run build`.
 - **Initial water variance ignored tuning.** The filter started the water state at a fixed 0.6² variance. It now starts at the water SD² in use (tuned or default) unless `initWVar` is passed explicitly. Default runs are unchanged (0.6² = 0.36).
 
+### New: one-time "What's new" popup
+- People who used an earlier version (their stored data is migrated and includes at least one weigh-in, measurement or food entry) see a one-time summary of the improvements that affect them. It replaces the first-run welcome for them, and offers "Review my profile" when the migrated profile may contain the old automatic defaults.
+- New users and old installs without any logged data don't see it. The flag is saved with the migrated data (so closing the tab before reading it doesn't lose it) and cleared for good when dismissed.
+
 ### New: daily data export
 - `buildDailyExport(state, { from, to, includeEntries })` in `src/lib/export.js`: a readable day-by-day JSON file (always metric), with one object per date that has data and fields only where data exists. Format in the README.
 - "Export daily data (JSON)" in the data sheet: All data / last 7, 30, 90 days / custom range with validation, an "Include individual food entries" toggle, a preview of the day counts, share sheet where supported (otherwise a download), and file name `bodytracker-daily_<from>_to_<to>.json`.

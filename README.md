@@ -117,7 +117,7 @@ weigh-in y = M + W + v,  v ~ N(0, 0.2²)
   female `495 / (1.29579 − 0.35004·log10(waist + hip − neck) + 0.22100·log10(height)) − 450`.
 
 ### Data safety
-- Schema version 3, with automatic migration of the original data (`bt_entries`, `bt_food`, `bt_settings`, `bt_goals`). Old one-per-day food rows become one entry on that day, marked complete, and a raw copy of the old data is kept in `bt_v1_backup`. Version 3 removes the "bia" source that version 2 put on weight-only entries (the pre-migration copy is kept in `bt_v2_backup`). Old settings may contain the former hidden defaults (height 175, age 25, activity 1.45), so migrated users are asked once to confirm their profile.
+- Schema version 3, with automatic migration of the original data (`bt_entries`, `bt_food`, `bt_settings`, `bt_goals`). Old one-per-day food rows become one entry on that day, marked complete, and a raw copy of the old data is kept in `bt_v1_backup`. Version 3 removes the "bia" source that version 2 put on weight-only entries (the pre-migration copy is kept in `bt_v2_backup`). Old settings may contain the former hidden defaults (height 175, age 25, activity 1.45), so migrated users are asked once to confirm their profile. Returning users with logged data also see a one-time "What's new" summary after the upgrade.
 - Every storage read and write is wrapped. Unreadable data is kept aside (`bt_corrupt_*`) and offered for download from the data screen, and an error screen lets you download raw data if rendering ever fails.
 - `navigator.storage.persist()` is requested on first load. A backup reminder appears every 30 days. iOS users are told to add the app to the Home Screen, because Safari can delete site data after 7 days without use.
 
