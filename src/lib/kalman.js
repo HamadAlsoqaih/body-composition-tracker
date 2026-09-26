@@ -16,7 +16,7 @@ export const DEFAULTS = {
   sigmaT: 15, // kcal/day random walk of TDEE
   scaleSD: 0.2, // kg, scale precision
   initMVar: 0.6 ** 2,
-  initWVar: 0.6 ** 2,
+  // initWVar: defaults to waterSD² (the marginal water variance) unless passed
   glycogenSD: 0.5, // kg/day extra process noise on M
   glycogenDays: 7,
   waterTagFactor: 2,
@@ -207,7 +207,8 @@ export function runKalman(inputs, params = {}) {
   const M0 = obs[0];
   if (M0 == null) throw new Error("first day must have a weigh-in");
   let x = [M0, 0, T0];
-  let P = [cfg.initMVar, 0, 0, 0, cfg.initWVar, 0, 0, 0, sigmaF * sigmaF];
+  const initWVar = cfg.initWVar != null ? cfg.initWVar : cfg.waterSD ** 2;
+  let P = [cfg.initMVar, 0, 0, 0, initWVar, 0, 0, 0, sigmaF * sigmaF];
 
   const xs = [x], Ps = [P], xPred = [null], PPred = [null], Fs = [null];
   const innovations = [];

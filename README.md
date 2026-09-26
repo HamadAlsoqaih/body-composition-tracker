@@ -6,7 +6,7 @@ A private, mobile-first web app for tracking weight, body composition and nutrit
 
 ## Features
 
-- **Body composition** — weight, body fat %, fat mass, muscle (or DEXA lean) mass, and ten tape measurements. Each entry records its source: BIA scale, DEXA, calipers or tape. Waist accepts 2–3 readings per entry, which are averaged.
+- **Body composition** — weight, body fat %, fat mass, muscle (or DEXA lean) mass, and ten tape measurements. Composition entries record their source (BIA scale, DEXA or calipers) and tape entries are marked as tape; weight-only entries have no source. Waist accepts 2–3 readings per entry, which are averaged.
 - **Progress rings and trend charts** — change vs your first or last value, goal rings for weight and body fat, charts with 1M / 3M / 6M / 1Y / All. The weight chart shows the smoothed trend and greys out ignored weigh-ins (which you can un-ignore).
 - **Maintenance calories (TDEE) with an honest range** — e.g. `2,950 ± 180 kcal/day`, labelled *Measured* or *Estimated* depending on how much comes from your own data.
 - **Targets** — calories, protein, fat and carbs for a lose / maintain / gain goal set as % of body weight per week, with an "on track" check and a goal ETA range.
@@ -23,7 +23,7 @@ npm test         # unit + accuracy tests (Vitest)
 npm run build    # production build into dist/
 ```
 
-`npm test` runs the whole suite with `TZ=Asia/Riyadh`, then re-runs the date tests with `TZ=America/New_York` (the script uses POSIX `VAR=value` syntax, so run it from a Unix-like shell).
+`npm test` runs the whole suite with `TZ=Asia/Riyadh`, then re-runs the date tests with `TZ=America/New_York`. The time zone is set with `cross-env`, so the script works in PowerShell/CMD as well as Unix shells. The GitHub Pages workflow runs `npm test` before every build, so a failing test blocks the deploy.
 
 ## Deploy to GitHub Pages
 
@@ -86,6 +86,7 @@ weigh-in y = M + W + v,  v ~ N(0, 0.2²)
 - **Intake.** Complete day: logged kcal with σ_I = max(50, 10%). Unlogged or incomplete day: the mean of complete days in the last 14 days with σ_I = max(300, their SD). If there are no complete days in that window, intake is assumed to track TDEE and the tissue–TDEE link is removed for that day, so weight change can't be misread as a TDEE change.
 - **Glycogen/water shifts.** Extra tissue-level noise (0.5 kg/day SD) for 7 days after day 1, unless you said you've already been eating at your current intake for 2+ weeks, and after any later intake shift (7-day mean changes by more than 400 kcal).
 - **Water-event tags** double σ_W on the tagged day and the 2 days after.
+- **Initialization.** M = first usable weight (variance 0.6²), W = 0 with variance equal to the water SD² in use (the tuned value when tuning applies, 0.6² by default), T = formula TDEE (variance σ_f²).
 - **Numerics.** Joseph-form covariance update, forced symmetry, non-negative variances. A Rauch–Tung–Striebel smoother is used for the history chart and the 14-day tissue-change rate.
 - **Per-user tuning.** After ≥ 42 days with ≥ 30 weigh-ins (then every 30 days), 20 combinations of φ ∈ {0.3, 0.5, 0.7, 0.85} and water SD ∈ {0.3, 0.45, 0.6, 0.8, 1.0} kg are scored by innovation log-likelihood. By default the final estimate **averages all 20 by their likelihood weights** instead of using only the best one, so uncertainty about the water noise shows up in the ± range (see *Deviations* below).
 - **Outputs.** TDEE ± 1.96 SD (rounded to 10); data share = 1 − posterior variance / σ_f² ("Measured" at ≥ 50%); 14-day tissue change rate with a 95% interval. Displayed numbers refresh once a week on your chosen day; the filter reruns on every change.
@@ -114,7 +115,7 @@ weigh-in y = M + W + v,  v ~ N(0, 0.2²)
   female `495 / (1.29579 − 0.35004·log10(waist + hip − neck) + 0.22100·log10(height)) − 450`.
 
 ### Data safety
-- Schema version 2, with automatic migration of the original data (`bt_entries`, `bt_food`, `bt_settings`, `bt_goals`). Old one-per-day food rows become one entry on that day, marked complete, and a raw copy of the old data is kept in `bt_v1_backup`. Old settings may contain the former hidden defaults (height 175, age 25, activity 1.45), so migrated users are asked once to confirm their profile.
+- Schema version 3, with automatic migration of the original data (`bt_entries`, `bt_food`, `bt_settings`, `bt_goals`). Old one-per-day food rows become one entry on that day, marked complete, and a raw copy of the old data is kept in `bt_v1_backup`. Version 3 removes the "bia" source that version 2 put on weight-only entries (the pre-migration copy is kept in `bt_v2_backup`). Old settings may contain the former hidden defaults (height 175, age 25, activity 1.45), so migrated users are asked once to confirm their profile.
 - Every storage read and write is wrapped. Unreadable data is kept aside (`bt_corrupt_*`) and offered for download from the data screen, and an error screen lets you download raw data if rendering ever fails.
 - `navigator.storage.persist()` is requested on first load. A backup reminder appears every 30 days. iOS users are told to add the app to the Home Screen, because Safari can delete site data after 7 days without use.
 
@@ -124,23 +125,23 @@ weigh-in y = M + W + v,  v ~ N(0, 0.2²)
 
 | Scenario | Requirement | Likelihood-averaged tuning (default) | Best-fit-only tuning |
 |---|---|---|---|
-| A: TDEE 2,800, intake 2,300 ± 150, 42 days | ≥ 95% within ±275 | 0.975 | 0.966 |
-| B: water SD 0.8, φ 0.7 | 95% interval covers truth ≥ 90% | **0.937** | 0.893 (fails) |
+| A: TDEE 2,800, intake 2,300 ± 150, 42 days | ≥ 95% within ±275 | 0.973 | 0.966 |
+| B: water SD 0.8, φ 0.7 | 95% interval covers truth ≥ 90% | **0.938** | 0.893 (fails) |
 | C: 20% unlogged + 2 typos | typos flagged; ≥ 95% within ±350 | flagged 100%; 0.991 | 100%; 0.988 |
-| D: 1.5 kg glycogen drop, answer "no" | ≥ 95% within ±275 | 0.969 | 0.964 |
+| D: 1.5 kg glycogen drop, answer "no" | ≥ 95% within ±275 | 0.969 | 0.965 |
 | D2: already dieting, answer "yes" | ≥ 95% within ±275; day-21 share ≥ D | 0.986; 0 exceptions | 0.979; 0 exceptions |
-| E: data share (median run, 500 runs) | < 0.3 at day 7; ≥ 0.7 at day 42 | 0.019; 0.802 | 0.019; 0.840 |
-| F: lean user, 90 days (200 runs) | error < 100 with Hall/Forbes; > 150 with 7,700 | 34.9; 237.1 | 35.7; 238.4 |
+| E: data share (median run, 500 runs) | < 0.3 at day 7; ≥ 0.7 at day 42 | 0.019; 0.806 | 0.019; 0.840 |
+| F: lean user, 90 days (200 runs) | error < 100 with Hall/Forbes; > 150 with 7,700 | 34.9; 237.3 | 35.7; 238.5 |
 | G: TDEE drifting 2,800 → 2,650 | ≥ 95% within ±250 at day 90 | 1.000 | 1.000 |
-| H: regression agrees with Kalman | ≥ 90% | 0.992 | 0.985 |
+| H: regression agrees with Kalman | ≥ 90% | 0.990 | 0.984 |
 
-For E, 85.8% of individual runs (default mode) reach a data share ≥ 0.7 at day 42, and 100% are below 0.3 at day 7. Run the second column with `TUNING_MODE=max npx vitest run tests/accuracy.test.js`.
+For E, 86.8% of individual runs (default mode) reach a data share ≥ 0.7 at day 42 (89.4% in best-fit-only mode), and 100% are below 0.3 at day 7. Run the second column with `npx cross-env TUNING_MODE=max vitest run tests/accuracy.test.js`.
 
 The composition tests use BIA noise of 0.8 kg (fat and muscle mass) and 1.0 point (BF%), and 0.7 cm per waist reading. Over 12 weeks, 99.2% of pure-noise runs are reported as "no measurable change", and 98.4% of runs with a true 4 kg fat loss and −4 cm waist are classified as "losing fat".
 
 ## Deviations from the original specification
 
-- **Water tuning uses likelihood-weighted averaging** over the 20-cell grid instead of only the maximum-likelihood cell. At 42 days the best cell is often a too-small water noise, which gives over-confident ranges (scenario B coverage 0.893). Averaging keeps the same grid, criterion and schedule, and brings coverage to 0.937. The best-fit cell is still shown in "Explain the math", and `tuningMode: "max"` is available.
+- **Water tuning uses likelihood-weighted averaging** over the 20-cell grid instead of only the maximum-likelihood cell. At 42 days the best cell is often a too-small water noise, which gives over-confident ranges (scenario B coverage 0.893). Averaging keeps the same grid, criterion and schedule, and brings coverage to 0.938. The best-fit cell is still shown in "Explain the math", and `tuningMode: "max"` is available.
 - **No complete intake in the last 14 days:** instead of feeding "current T estimate" into the tissue equation, which would let weight change pull on TDEE with no intake data behind it, intake is assumed to track TDEE for that day (σ_I = 300).
 - **Intake shifts** compare the 7 days starting at a day with the 7 days before it (each needs ≥ 3 complete days). A run of qualifying days counts as one shift, placed at the largest difference.
 - **Body-fat readings** older than 180 days are not used for energy per kg or Katch-McArdle.

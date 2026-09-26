@@ -131,6 +131,12 @@ describe("observation handling", () => {
     expect(r.x[5]).toEqual(r.xPred[5]);
     expect(r.innovations.some((i) => i.t === 5)).toBe(false);
   });
+  it("initial water variance follows the water SD (e.g. tuned) unless initWVar is given", () => {
+    expect(runKalman(base(3), { waterSD: 1.0 }).P[0][4]).toBe(1.0);
+    expect(runKalman(base(3), { waterSD: 0.3 }).P[0][4]).toBeCloseTo(0.09, 12);
+    expect(runKalman(base(3), { waterSD: 1.0, initWVar: 0.25 }).P[0][4]).toBe(0.25);
+  });
+
   it("initialises M from the first weight, W = 0, T = formula, with spec variances", () => {
     const r = runKalman(base(3));
     expect(r.x[0]).toEqual([90, 0, 2700]);

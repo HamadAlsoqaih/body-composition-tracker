@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.1.0
+
+### Fixes
+- **`npm test` on Windows.** The test script set the time zone with POSIX `TZ=…` syntax, which fails in PowerShell/CMD. It now uses `cross-env` (new devDependency), and the date tests first assert that the requested time zone actually took effect.
+- **Weight-only entries were labelled "bia".** A measurement source is now stored only on entries with a composition value (body fat, fat mass, muscle/lean mass); weight-only entries have none and tape-only entries stay "tape". Schema version 3 migrates existing data by removing "bia" from entries without composition values (the pre-migration copy is kept in `bt_v2_backup`, so the original `bt_v1_backup` is never overwritten). The recent-entries list labels source-less entries "weight".
+- **Deploys ran without tests.** The GitHub Pages workflow now runs `npm test` after `npm ci` and before `npm run build`.
+- **Initial water variance ignored tuning.** The filter started the water state at a fixed 0.6² variance. It now starts at the water SD² in use (tuned or default) unless `initWVar` is passed explicitly. Default runs are unchanged (0.6² = 0.36).
+
+Accuracy scenarios before → after the water-variance fix (1,000 runs unless noted):
+
+| Scenario | Requirement | Averaged tuning (default) | Best-fit-only tuning |
+|---|---|---|---|
+| A | ≥ 95% within ±275 | 0.975 → 0.973 | 0.966 → 0.966 |
+| B | coverage ≥ 90% | 0.937 → 0.938 | 0.893 → 0.893 (fails in both) |
+| C | ≥ 95% within ±350; typos flagged | 0.991 → 0.991; 100% | 0.988 → 0.988; 100% |
+| D | ≥ 95% within ±275 | 0.969 → 0.969 | 0.964 → 0.965 |
+| D2 | ≥ 95% within ±275; day-21 share ≥ D | 0.986 → 0.986; 0 exceptions | 0.979 → 0.979; 0 exceptions |
+| E (median, 500 runs) | < 0.3 day 7; ≥ 0.7 day 42 | 0.019 / 0.802 → 0.019 / 0.806 | 0.019 / 0.840 → 0.019 / 0.840 |
+| F (200 runs) | < 100 with Hall/Forbes; > 150 with 7,700 | 34.9 / 237.1 → 34.9 / 237.3 | 35.7 / 238.4 → 35.7 / 238.5 |
+| G | ≥ 95% within ±250 | 1.000 → 1.000 | 1.000 → 1.000 |
+| H | ≥ 90% agreement | 0.992 → 0.990 | 0.985 → 0.984 |
+
 ## 2.0.0
 
 A rebuild of the estimation engine, with bug fixes and safety guardrails. Existing data is migrated automatically.
