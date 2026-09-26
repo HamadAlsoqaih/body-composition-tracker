@@ -35,7 +35,7 @@ After each action you get `[new on screen] …` with any words that just appeare
 3. `nextday`.
 
 **Days 1–7:** do everything by hand, one step at a time. Write down every moment of confusion ("I didn't know where to…", "I expected X but got Y").
-**From day 8:** you may speed up with your own script (a `run` file, or a small Node script in your folder that calls `bt.mjs` and parses the `day` text; keep scripts in your folder) — but it must still tap and type through the app, and after each batch (at most 7 days) you must look at anything new the app shows (popups, banners, notes, recommendations) and react as your persona would.
+**From day 8:** you may speed up with your own script (a `run` file, or a small Node script in your folder that calls `bt.mjs` and parses the `day` text; keep scripts in your folder) — but it must still tap and type through the app, and after each batch (at most 7 days) you must look at anything new the app shows (popups, banners, notes, recommendations) and react as your persona would. `nextday` cannot be undone: make your script stop (not skip ahead) if any step of the day fails, and check that the day was logged before it calls `nextday`.
 
 **Once a week** (every 7th day): open the parts of the app that tell you your maintenance calories, target, recommendation and any warnings. Write what you, as this person, think they mean and what you'll do. If your persona would follow the advice, use `plan` to change what you eat (with your reason).
 
