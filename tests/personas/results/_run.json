@@ -87,8 +87,10 @@
       "agent": "af7ddda87efbdee5e"
     },
     "p14": {
-      "status": "pending",
-      "attempts": 0
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T21:29:41.839Z",
+      "agent": "aa2a9cf0d7119855e"
     },
     "p15": {
       "status": "pending",
@@ -595,6 +597,16 @@
       "set": [
         "status=completed",
         "finishedAt=now"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:29:41.839Z",
+      "id": "p14",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=aa2a9cf0d7119855e"
       ]
     }
   ]
