@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import { compareEnds, analyzeComposition, navyBodyFat, averageReadings, signal, MDC } from "../src/lib/composition.js";
 import { addDays } from "../src/lib/dates.js";
 import { rng } from "./sim.js";
+import { bodyFatEstimate } from "../src/lib/energy.js";
+import { bodyFatReadings } from "../src/lib/analysis.js";
 
 const START = "2026-06-01";
 
@@ -116,5 +118,26 @@ describe("classification", () => {
     expect(MDC.dexa.fatMass).toBe(1.0);
     const d = [0, 7, 14, 35, 42, 49].map((x, i) => ({ date: addDays(START, x), source: "dexa", fatMass: i < 3 ? 20 : 18.9, muscleMass: 50 }));
     expect(analyzeComposition(d).status).toBe("cut");
+  });
+});
+
+describe("weight-only entries (no source)", () => {
+  const weightOnly = [0, 7, 14, 28, 35, 42].map((d, i) => ({ date: addDays(START, d), weight: 90 - i }));
+  it("are ignored by the composition analysis", () => {
+    expect(analyzeComposition(weightOnly).status).toBe("insufficient");
+    const bia = [0, 7, 14, 35, 42, 49].map((d) => ({ date: addDays(START, d), source: "bia", fatMass: 20, muscleMass: 38, bodyFat: 22 }));
+    const withWeights = analyzeComposition([...bia, ...weightOnly]);
+    const alone = analyzeComposition(bia);
+    expect(withWeights.metrics["bia.fatMass"]).toEqual(alone.metrics["bia.fatMass"]);
+    expect(withWeights.metrics["bia.muscleMass"]).toEqual(alone.metrics["bia.muscleMass"]);
+    expect(withWeights.status).toBe(alone.status);
+  });
+  it("are ignored by bodyFatEstimate", () => {
+    const person = { date: "2026-09-26", weightKg: 80, heightCm: 180, age: 40, sex: "male" };
+    const entries = [{ date: "2026-09-20", weight: 80 }, { date: "2026-09-21", weight: 79.5, source: "bia" }];
+    expect(bodyFatReadings(entries, {})).toEqual([]);
+    expect(bodyFatEstimate({ ...person, readings: bodyFatReadings(entries, {}) }).source).toBe("deurenberg");
+    // even if passed directly, entries without a body-fat value are not readings
+    expect(bodyFatEstimate({ ...person, readings: entries }).source).toBe("deurenberg");
   });
 });

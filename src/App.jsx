@@ -231,7 +231,7 @@ export default function App() {
             {[...entries].sort((a, b) => b.date.localeCompare(a.date) || String(b.time || "").localeCompare(String(a.time || ""))).slice(0, 8).map((e) => (
               <div key={e.id} className="entryrow">
                 <div className="grow">
-                  <b>{e.date}</b> <span className="lbl">· {e.source === "tape" ? "tape" : e.source.toUpperCase()}</span>
+                  <b>{e.date}</b> <span className="lbl">· {e.source === "tape" ? "tape" : e.source ? e.source.toUpperCase() : "weight"}</span>
                   <div className="lbl">
                     {e.weight != null && `${W(e.weight)} ${units.weight} `}
                     {e.bodyFat != null && `${fmt(e.bodyFat)}% `}

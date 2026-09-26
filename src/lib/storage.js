@@ -5,7 +5,7 @@ import { nearestActivityLevel, BF_SOURCES } from "./energy.js";
 import { RATE_LIMITS } from "./targets.js";
 import { MACROS } from "./foodlog.js";
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 export const KEYS = {
   entries: "bt_entries",
   food: "bt_food",
@@ -19,6 +19,8 @@ export const CORRUPT_PREFIX = "bt_corrupt_";
 
 export const TAPE_KEYS = ["neck", "chest", "waist", "hips", "armL", "armR", "thighL", "thighR", "calfL", "calfR"];
 export const COMP_KEYS = ["weight", "bodyFat", "fatMass", "muscleMass"];
+/** Composition values — the only fields a measurement source applies to. */
+export const COMPOSITION_VALUE_KEYS = ["bodyFat", "fatMass", "muscleMass"];
 export const ENTRY_SOURCES = ["bia", "dexa", "calipers", "tape"];
 
 export const DEFAULT_SETTINGS = Object.freeze({
@@ -100,7 +102,11 @@ export function sanitizeEntry(e, i = 0) {
   const hasComp = COMP_KEYS.some((k) => out[k] != null);
   const hasTape = TAPE_KEYS.some((k) => out[k] != null);
   if (!hasComp && !hasTape) return null;
-  out.source = ENTRY_SOURCES.includes(e.source) ? e.source : hasComp ? "bia" : "tape";
+  // source describes how composition was measured: weight-only entries get none
+  const hasComposition = COMPOSITION_VALUE_KEYS.some((k) => out[k] != null);
+  if (ENTRY_SOURCES.includes(e.source)) out.source = e.source;
+  else if (hasComposition) out.source = "bia";
+  else if (hasTape) out.source = "tape";
   return out;
 }
 
@@ -182,6 +188,15 @@ const arr = (v) => (Array.isArray(v) ? v : []);
  * hidden defaults (height 175, age 25, activity 1.45, rate in kg/week).
  * Old food days become one entry on that day, marked complete.
  */
+/** v2 → v3: weight-only entries were labelled "bia"; they have no composition source. */
+export function stripWeightOnlySource(entries) {
+  return entries.map((e) => {
+    if (e.source !== "bia" || COMPOSITION_VALUE_KEYS.some((k) => e[k] != null)) return e;
+    const { source, ...rest } = e;
+    return rest;
+  });
+}
+
 export function migrate(raw, today = localDateString()) {
   const version = raw?.meta?.schemaVersion ?? raw?.schemaVersion ?? 1;
   const s = emptyState();
@@ -223,6 +238,7 @@ export function migrate(raw, today = localDateString()) {
     }
     if (!s.meta.createdAt && hasData) s.meta.createdAt = today;
   }
+  if (version < 3) s.entries = stripWeightOnlySource(s.entries);
   return s;
 }
 
@@ -241,7 +257,7 @@ export function loadState(storage, today = localDateString()) {
   }
   const version = raw.meta?.schemaVersion ?? 1;
   const hadLegacy = version < SCHEMA_VERSION && (raw.entries || raw.food || raw.settings || raw.goals);
-  if (hadLegacy) safeSave(storage, LEGACY_BACKUP_KEY, { savedAt: today, entries: raw.entries ?? null, food: raw.food ?? null, settings: raw.settings ?? null, goals: raw.goals ?? null });
+  if (hadLegacy) safeSave(storage, version === 1 ? LEGACY_BACKUP_KEY : `bt_v${version}_backup`, { savedAt: today, entries: raw.entries ?? null, food: raw.food ?? null, settings: raw.settings ?? null, goals: raw.goals ?? null });
   const state = migrate(raw, today);
   if (!state.meta.createdAt) state.meta.createdAt = today;
   return { state, corrupt, errors, migratedFrom: hadLegacy ? version : null };

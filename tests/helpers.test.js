@@ -59,7 +59,8 @@ describe("storage helpers", () => {
     expect(safeGetRaw(null, "k").raw).toBeNull();
   });
   it("sanitizeEntry / sanitizeFood", () => {
-    expect(sanitizeEntry({ date: "2026-09-01", weight: "80.5" })).toMatchObject({ weight: 80.5, source: "bia" });
+    expect(sanitizeEntry({ date: "2026-09-01", weight: "80.5" })).toEqual({ id: "m0-2026-09-01", date: "2026-09-01", weight: 80.5 }); // weight-only: no source
+    expect(sanitizeEntry({ date: "2026-09-01", weight: 80, bodyFat: 20 }).source).toBe("bia");
     expect(sanitizeEntry({ date: "2026-09-01", weight: -3 })).toBeNull();
     expect(sanitizeEntry({ date: "2026-09-01", waist: 90, source: "tape", waistReadings: [90, "x", 91] }).waistReadings).toEqual([90, 91]);
     expect(sanitizeFood({ date: "2026-09-01", calories: 500 })).toMatchObject({ kcal: 500, protein: null });

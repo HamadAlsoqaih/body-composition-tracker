@@ -36,7 +36,6 @@ export default function EntrySheet({ type, today, units, onSave, onClose }) {
       const [hh, mm] = (d.time || "").split(":").map(Number);
       const [y, mo, da] = e.date.split("-").map(Number);
       if (Number.isFinite(hh) && Number.isFinite(mm)) e.time = new Date(y, mo - 1, da, hh, mm).toISOString();
-      e.source = d.source;
       const w = weightFromDisplay(d.weight, wu);
       const bf = parseNum(d.bodyFat);
       const fm = weightFromDisplay(d.fatMass, wu);
@@ -46,6 +45,8 @@ export default function EntrySheet({ type, today, units, onSave, onClose }) {
       if (fm != null) e.fatMass = fm;
       else if (w != null && bf != null) e.fatMass = +(w * (bf / 100)).toFixed(2);
       if (mm2 != null) e.muscleMass = mm2;
+      // source describes the composition method; weight-only entries have none
+      if ([e.bodyFat, e.fatMass, e.muscleMass].some((v) => v != null)) e.source = d.source;
       if ([e.weight, e.bodyFat, e.fatMass, e.muscleMass].every((v) => v == null)) return setErr("Enter at least one value.");
       if ((e.weight != null && !(e.weight > 20 && e.weight < 400)) || (e.bodyFat != null && !(e.bodyFat > 2 && e.bodyFat < 75))) return setErr("That value looks out of range — please check it.");
     } else {

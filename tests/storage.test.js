@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   migrate, loadState, saveState, safeLoad, safeSave, buildBackup, validateBackup, mergeStates, weightsCSV,
   measurementsCSV, foodCSV, needsBackupReminder, isIOSBrowser, requestPersistentStorage, KEYS, SCHEMA_VERSION,
-  LEGACY_BACKUP_KEY, CORRUPT_PREFIX, countsOf, emptyState,
+  LEGACY_BACKUP_KEY, CORRUPT_PREFIX, countsOf, emptyState, stripWeightOnlySource,
 } from "../src/lib/storage.js";
 
 function memStorage(init = {}) {
@@ -159,5 +159,53 @@ describe("reminders and platform", () => {
     expect(await requestPersistentStorage(nav)).toEqual({ supported: true, persisted: true });
     const bad = { storage: { persist: async () => { throw new Error("x"); } } };
     expect((await requestPersistentStorage(bad)).supported).toBe(false);
+  });
+});
+
+describe("schema v3: weight-only entries have no source", () => {
+  const v2 = {
+    bt_entries: JSON.stringify([
+      { id: 1, date: "2026-09-01", weight: 80, source: "bia" }, // weight-only, mislabelled
+      { id: 2, date: "2026-09-02", weight: 80, bodyFat: 20, source: "bia" },
+      { id: 3, date: "2026-09-03", fatMass: 15, muscleMass: 55, source: "dexa" },
+      { id: 4, date: "2026-09-04", waist: 90, source: "tape" },
+    ]),
+    bt_meta: JSON.stringify({ schemaVersion: 2, createdAt: "2026-09-01" }),
+    bt_v1_backup: JSON.stringify({ original: true }),
+  };
+
+  it("migrates v2 → v3 by removing 'bia' from entries without composition values", () => {
+    const st = memStorage(v2);
+    const { state, migratedFrom } = loadState(st, "2026-09-10");
+    expect(migratedFrom).toBe(2);
+    const byId = Object.fromEntries(state.entries.map((e) => [e.id, e]));
+    expect("source" in byId[1]).toBe(false);
+    expect(byId[2].source).toBe("bia");
+    expect(byId[3].source).toBe("dexa");
+    expect(byId[4].source).toBe("tape");
+    saveState(st, state);
+    expect(JSON.parse(st.dump()[KEYS.meta]).schemaVersion).toBe(3);
+    // the original v1 copy is not overwritten by the v2 → v3 step
+    expect(JSON.parse(st.dump()[LEGACY_BACKUP_KEY])).toEqual({ original: true });
+    expect(JSON.parse(st.dump().bt_v2_backup).entries).toHaveLength(4);
+  });
+
+  it("v1 weight-only entries get no source; composition entries default to 'bia'", () => {
+    const { state } = loadState(memStorage(V1), "2026-09-01");
+    const byId = Object.fromEntries(state.entries.map((e) => [e.id, e]));
+    expect("source" in byId[3]).toBe(false);
+    expect(byId[1].source).toBe("bia");
+    expect(byId[2].source).toBe("tape");
+  });
+
+  it("stripWeightOnlySource leaves everything else untouched", () => {
+    const e = [{ id: 1, date: "2026-09-01", weight: 80, source: "bia" }, { id: 2, date: "2026-09-01", weight: 80, bodyFat: 20, source: "bia" }];
+    expect(stripWeightOnlySource(e)).toEqual([{ id: 1, date: "2026-09-01", weight: 80 }, e[1]]);
+  });
+
+  it("imported v2 backups are migrated the same way", () => {
+    const v = validateBackup(JSON.stringify({ schemaVersion: 2, entries: [{ id: 1, date: "2026-09-01", weight: 80, source: "bia" }] }));
+    expect(v.ok).toBe(true);
+    expect("source" in v.state.entries[0]).toBe(false);
   });
 });

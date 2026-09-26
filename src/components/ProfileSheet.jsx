@@ -64,7 +64,7 @@ export default function ProfileSheet({ state, today, latestWeight, onSave, onClo
       setErr(`Please fill in: ${problems.join(", ")}.`);
       return;
     }
-    const newEntry = latestWeight != null && Math.abs(weightKg - latestWeight) < 0.05 ? null : { id: newId(), date: today, time: new Date().toISOString(), weight: weightKg, source: "bia" };
+    const newEntry = latestWeight != null && Math.abs(weightKg - latestWeight) < 0.05 ? null : { id: newId(), date: today, time: new Date().toISOString(), weight: weightKg };
     onSave({
       settings: {
         units,
