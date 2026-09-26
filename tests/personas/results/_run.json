@@ -127,8 +127,10 @@
       "attempts": 0
     },
     "p21": {
-      "status": "pending",
-      "attempts": 0
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T21:57:20.025Z",
+      "agent": "a9492abe1e1f71c99"
     },
     "p22": {
       "status": "skipped",
@@ -701,6 +703,16 @@
       "set": [
         "status=completed",
         "finishedAt=now"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:57:20.026Z",
+      "id": "p21",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a9492abe1e1f71c99"
       ]
     }
   ]
