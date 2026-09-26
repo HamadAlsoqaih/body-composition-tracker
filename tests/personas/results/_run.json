@@ -23,10 +23,11 @@
       "finishedAt": "2026-09-26T21:16:04.847Z"
     },
     "p04": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:11:41.252Z",
-      "agent": "a35c5d113cef37a6c"
+      "agent": "a35c5d113cef37a6c",
+      "finishedAt": "2026-09-26T21:51:22.560Z"
     },
     "p05": {
       "status": "completed",
@@ -617,6 +618,14 @@
     {
       "at": "2026-09-26T21:45:21.793Z",
       "id": "p07",
+      "set": [
+        "status=completed",
+        "finishedAt=now"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:51:22.560Z",
+      "id": "p04",
       "set": [
         "status=completed",
         "finishedAt=now"
