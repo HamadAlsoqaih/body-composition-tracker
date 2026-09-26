@@ -51,10 +51,11 @@
       "finishedAt": "2026-09-26T21:45:21.792Z"
     },
     "p08": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:16:15.171Z",
-      "agent": "ab86279d6ad07d67e"
+      "agent": "ab86279d6ad07d67e",
+      "finishedAt": "2026-09-26T21:57:10.227Z"
     },
     "p09": {
       "status": "completed",
@@ -693,6 +694,14 @@
     {
       "at": "2026-09-26T21:57:00.131Z",
       "note": "User change of plan (21:56): finish the 7 running (p08,p10,p12,p13,p14,p15,p17); start only p21 and p18 as slots free up; p19,p20,p22,p23,p25 skipped by choice (not started)."
+    },
+    {
+      "at": "2026-09-26T21:57:10.227Z",
+      "id": "p08",
+      "set": [
+        "status=completed",
+        "finishedAt=now"
+      ]
     }
   ]
 }
