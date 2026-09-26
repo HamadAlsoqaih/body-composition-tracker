@@ -7,8 +7,8 @@ export const css = `
   padding: max(env(safe-area-inset-top), 16px) 16px calc(150px + env(safe-area-inset-bottom)) 16px;
   max-width: 640px; margin: 0 auto;
 }
-.top { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; }
-.headright { display:flex; align-items:center; gap:10px; }
+.top { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:10px 8px; margin-bottom:22px; }
+.headright { display:flex; align-items:center; gap:10px; margin-left:auto; }
 .gear { border:1px solid var(--line); background:var(--panel); color:var(--dim); width:38px; height:38px; border-radius:12px; font-size:17px; }
 .gear:active { transform:scale(.95); }
 .eyebrow { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:4px; }
@@ -16,20 +16,22 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .basetoggle { display:flex; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:3px; }
 .basetoggle button { border:0; background:transparent; color:var(--dim); font-size:12px; font-weight:600; padding:6px 12px; border-radius:999px; }
 .basetoggle button.on { background:#26303f; color:#fff; }
-.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:8px; }
-.grid.tape { grid-template-columns:repeat(3,1fr); gap:10px; }
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:8px; }
+.grid.tape { grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
 .sectlabel { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:26px 4px 12px; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:transform .12s, border-color .12s; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:transform .12s, border-color .12s; min-width:0; }
 .card:active { transform:scale(.97); border-color:#2e3a4d; }
-.ringwrap { position:relative; display:flex; align-items:center; justify-content:center; }
-.ringtrack { border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background .7s cubic-bezier(.4,0,.2,1); }
-.ringhole { border-radius:50%; background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ringwrap { position:relative; display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:1 / 1; }
+@supports not (aspect-ratio: 1 / 1) { .ringwrap { width:var(--ring-size); height:var(--ring-size); max-width:100%; } }
+.ringtrack { width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:background .7s cubic-bezier(.4,0,.2,1); }
+.ringhole { width:100%; height:100%; border-radius:50%; background:var(--panel); display:flex; flex-direction:column; align-items:center; justify-content:center; }
 .ringinner { text-align:center; line-height:1; }
 .val { font-size:24px; font-weight:680; letter-spacing:-.02em; }
 .val.sm { font-size:18px; }
 .u { font-size:10px; color:var(--dim); margin-top:3px; }
 .clabel { font-size:13px; font-weight:600; margin-top:2px; }
 .clabel.sm { font-size:11px; }
+.clabel, .cdelta { max-width:100%; text-align:center; overflow-wrap:anywhere; }
 .cdelta { font-size:12px; font-weight:600; }
 .cdelta.sm { font-size:10px; }
 .empty { text-align:center; color:var(--dim); padding:80px 20px; font-size:15px; }
@@ -215,5 +217,13 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
   .welcomecard { padding:18px 14px calc(18px + env(safe-area-inset-bottom)); border-radius:20px; }
   .wn-card .wtitle { font-size:20px; }
   .wn-list .wfeat span, .wn-box { font-size:13px; }
+}
+
+@media (max-width: 400px) {
+  .eyebrow { letter-spacing:.1em; }
+  h1 { font-size:27px; }
+  .headright { gap:6px; }
+  .gear { width:34px; height:34px; }
+  .basetoggle button { padding:6px 8px; }
 }
 `;

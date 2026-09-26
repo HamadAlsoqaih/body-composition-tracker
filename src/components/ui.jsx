@@ -49,15 +49,14 @@ export function Seg({ options, value, onChange, disabled = [] }) {
   );
 }
 
+/** Progress ring. `size` is the maximum diameter; it shrinks to fit narrow cards. */
 export function Ring({ pct, color, size = 128, stroke = 9, children }) {
   const clamped = Math.max(0, Math.min(1, Math.abs(pct || 0)));
   const deg = clamped * 360;
   return (
-    <div className="ringwrap" style={{ width: size, height: size }}>
-      <div className="ringtrack" style={{ width: size, height: size, background: `conic-gradient(${color} ${deg}deg, #1c2230 ${deg}deg 360deg)` }}>
-        <div className="ringhole" style={{ width: size - stroke * 2, height: size - stroke * 2 }}>
-          {children}
-        </div>
+    <div className="ringwrap" style={{ maxWidth: size, "--ring-size": `${size}px` }}>
+      <div className="ringtrack" style={{ padding: stroke, background: `conic-gradient(${color} ${deg}deg, #1c2230 ${deg}deg 360deg)` }}>
+        <div className="ringhole">{children}</div>
       </div>
     </div>
   );
