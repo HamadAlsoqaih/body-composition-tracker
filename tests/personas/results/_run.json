@@ -86,10 +86,11 @@
       "finishedAt": "2026-09-26T22:01:15.759Z"
     },
     "p13": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:24:50.139Z",
-      "agent": "af7ddda87efbdee5e"
+      "agent": "af7ddda87efbdee5e",
+      "finishedAt": "2026-09-26T22:08:03.295Z"
     },
     "p14": {
       "status": "running",
@@ -752,6 +753,14 @@
     {
       "at": "2026-09-26T22:07:07.283Z",
       "note": "Decision: the nightly scrape only runs inside nextday, so the last simulated day had no row (week 12 missing). Added finalscrape.mjs: after a persona's agent finishes, the orchestrator reads the same visible UI values once at 23:30 on the last day (same storage, clock, zone). Run for all completed personas."
+    },
+    {
+      "at": "2026-09-26T22:08:03.295Z",
+      "id": "p13",
+      "set": [
+        "status=completed",
+        "finishedAt=now"
+      ]
     }
   ]
 }
