@@ -1,7 +1,7 @@
 export const css = `
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 .app {
-  --bg:#0b0e14; --panel:#141922; --line:#1c2230; --txt:#e8ecf2; --dim:#6b7480;
+  --bg:#0b0e14; --panel:#141922; --line:#1c2230; --txt:#e8ecf2; --dim:#8a94a2; --faint:#7d8795;
   background: var(--bg); color: var(--txt); min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
   padding: max(env(safe-area-inset-top), 16px) 16px calc(150px + env(safe-area-inset-bottom)) 16px;
@@ -62,7 +62,7 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .stat { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:14px; }
 .statnum { font-size:26px; font-weight:680; letter-spacing:-.02em; }
 .statlab { font-size:12px; color:var(--dim); margin-top:4px; line-height:1.3; }
-.statlab small { color:#4a525e; }
+.statlab small { color:var(--faint); }
 .protcard { border-radius:16px; padding:14px 16px; margin-bottom:14px; border:1px solid var(--line); background:var(--panel); }
 .protcard.low { border-color:#7a5a2b; }
 .protrow { display:flex; justify-content:space-between; align-items:center; font-size:15px; }
@@ -75,7 +75,7 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .macronum { font-size:24px; font-weight:680; letter-spacing:-.02em; }
 .macronum span { font-size:14px; color:var(--dim); font-weight:500; margin-left:2px; }
 .macrolab { font-size:12.5px; color:var(--dim); margin-top:2px; }
-.macrolab small { color:#4a525e; }
+.macrolab small { color:var(--faint); }
 .macronote { font-size:12.5px; line-height:1.45; color:var(--dim); border-radius:12px; padding:11px 14px; margin-bottom:10px; border:1px solid var(--line); background:var(--panel); }
 .macronote.low { border-color:#5a4a2b; }
 .notecard { font-size:12.5px; color:var(--dim); line-height:1.5; background:var(--panel); border:1px dashed var(--line); border-radius:14px; padding:12px 14px; margin-bottom:14px; }
@@ -114,7 +114,7 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .moverow b { font-weight:680; }
 .mv-good { color:#3ddc84; }
 .mv-bad { color:#ff5c72; }
-.mv-flat { color:#8a94a2; }
+.mv-flat { color:var(--dim); }
 .sheet { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:flex-end; justify-content:center; z-index:50; backdrop-filter:blur(4px); }
 .sheetinner { background:var(--panel); width:100%; max-width:480px; margin:0 auto; border-radius:24px 24px 0 0; padding:20px 18px calc(24px + env(safe-area-inset-bottom)); max-height:90vh; overflow-y:auto; overflow-x:hidden; border-top:1px solid var(--line); animation:up .28s cubic-bezier(.4,0,.2,1); }
 @keyframes up { from { transform:translateY(100%); } }
@@ -127,7 +127,7 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .fld { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; min-width:0; }
 .fld span { font-size:13px; color:var(--dim); font-weight:500; }
 .fld span em { color:#ff5c72; font-style:normal; }
-.fld span small { color:#4a525e; }
+.fld span small { color:var(--faint); }
 .fld input { width:100%; max-width:100%; min-width:0; -webkit-appearance:none; appearance:none; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:13px 14px; color:var(--txt); font-size:16px; }
 .fld input[type="date"] { display:block; text-align:left; }
 .fld input:focus { outline:none; border-color:#5aa9e6; }
@@ -152,10 +152,10 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 
 .sheetinner.wide { max-width:560px; }
 .seg:disabled { opacity:.35; }
-.fldhint { font-size:11.5px !important; color:#4a525e !important; line-height:1.35; }
+.fldhint { font-size:11.5px !important; color:var(--faint) !important; line-height:1.35; }
 .fld select { width:100%; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:13px 14px; color:var(--txt); font-size:16px; -webkit-appearance:none; appearance:none; }
 .fld input[type="time"] { display:block; text-align:left; }
-.footer { text-align:center; font-size:11.5px; color:#4a525e; margin:28px 0 8px; line-height:1.5; }
+.footer { text-align:center; font-size:11.5px; color:var(--faint); margin:28px 0 8px; line-height:1.5; }
 .footer button { background:none; border:0; color:#5aa9e6; font-size:11.5px; padding:0 4px; }
 .banner { display:flex; flex-direction:column; gap:8px; background:var(--panel); border:1px solid #2a4258; border-radius:14px; padding:12px 14px; margin-bottom:12px; font-size:13px; line-height:1.45; }
 .banner.warn { border-color:#5a4a2b; }
@@ -203,14 +203,14 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .wn-card { position:relative; padding-top:22px; color:var(--txt); outline:none; }
 .wn-close { position:absolute; top:14px; right:14px; }
 .wn-card .wtitle { margin-right:36px; text-align:left; font-size:23px; }
-.wn-card .wlead { text-align:left; margin-bottom:16px; color:#aab3bf; }
+.wn-card .wlead { text-align:left; margin-bottom:16px; color:var(--dim); }
 .wn-list { list-style:none; padding:0; margin:0 0 16px; }
-.wn-list .wfeat span { color:#aab3bf; }
+.wn-list .wfeat span { color:var(--dim); }
 .wn-box { background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-bottom:12px; font-size:13.5px; line-height:1.5; }
 .wn-box b { font-size:14.5px; }
-.wn-box p { margin:4px 0 0; color:#aab3bf; }
+.wn-box p { margin:4px 0 0; color:var(--dim); }
 .wn-secondary { margin-top:10px; background:#26303f; color:#fff; font-size:15px; padding:13px; }
-.wn-next { font-size:13.5px; line-height:1.5; color:#aab3bf; margin:4px 0 10px; }
+.wn-next { font-size:13.5px; line-height:1.5; color:var(--dim); margin:4px 0 10px; }
 .wbtn:focus-visible, .wn-close:focus-visible { outline:2px solid #fff; outline-offset:2px; }
 @media (max-width: 360px) {
   .welcome { padding:10px; }
@@ -226,4 +226,6 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
   .gear { width:34px; height:34px; }
   .basetoggle button { padding:6px 6px; font-size:11.5px; }
 }
+
+.fld input::placeholder, .fld textarea::placeholder { color:var(--faint); opacity:1; }
 `;

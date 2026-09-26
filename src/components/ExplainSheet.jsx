@@ -135,8 +135,8 @@ export default function ExplainSheet({ m, units, onClose }) {
           <ResponsiveContainer>
             <ComposedChart data={k.history} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
               <CartesianGrid stroke="#1c2230" vertical={false} />
-              <XAxis dataKey="date" tick={{ fill: "#6b7480", fontSize: 11 }} tickFormatter={(d) => d.slice(5)} minTickGap={24} />
-              <YAxis tick={{ fill: "#6b7480", fontSize: 11 }} domain={["auto", "auto"]} />
+              <XAxis dataKey="date" tick={{ fill: "var(--dim)", fontSize: 11 }} tickFormatter={(d) => d.slice(5)} minTickGap={24} />
+              <YAxis tick={{ fill: "var(--dim)", fontSize: 11 }} domain={["auto", "auto"]} />
               <Tooltip contentStyle={{ background: "#141922", border: "1px solid #26303f", borderRadius: 12, color: "#fff" }} formatter={(v) => (Array.isArray(v) ? `${fmtInt(v[0])}–${fmtInt(v[1])}` : fmtInt(v))} />
               <Area dataKey={(d) => [d.lo, d.hi]} name="95% band" stroke="none" fill="#5aa9e6" fillOpacity={0.15} isAnimationActive={false} />
               <Line dataKey="smoothed" name="maintenance" stroke="#5aa9e6" strokeWidth={2} dot={false} isAnimationActive={false} />

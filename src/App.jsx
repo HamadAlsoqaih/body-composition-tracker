@@ -37,7 +37,7 @@ const OVERSHOOT_COLOR = "#22d3ee";
 const NOGOAL_COLOR = "#5aa9e6";
 
 function colorFor(m, d) {
-  if (d == null || d === 0) return "#5b6472";
+  if (d == null || d === 0) return "var(--faint)";
   if (m.goodDir === "neutral") return "#5aa9e6";
   return (m.goodDir === "down" ? d < 0 : d > 0) ? "#3ddc84" : "#ff5c72";
 }

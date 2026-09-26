@@ -44,12 +44,12 @@ export default function ChartSheet({ metric, entries, model, units, today, inclu
           <ResponsiveContainer>
             <ComposedChart data={data} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
               <CartesianGrid stroke="#1c2230" vertical={false} />
-              <XAxis dataKey="date" tick={{ fill: "#6b7480", fontSize: 11 }} tickFormatter={(d) => d.slice(5)} minTickGap={20} />
-              <YAxis tick={{ fill: "#6b7480", fontSize: 11 }} domain={["auto", "auto"]} tickFormatter={(v) => fmt(v, 1)} />
+              <XAxis dataKey="date" tick={{ fill: "var(--dim)", fontSize: 11 }} tickFormatter={(d) => d.slice(5)} minTickGap={20} />
+              <YAxis tick={{ fill: "var(--dim)", fontSize: 11 }} domain={["auto", "auto"]} tickFormatter={(v) => fmt(v, 1)} />
               <Tooltip contentStyle={tip} formatter={(v, name) => [`${fmt(v, 1)} ${unit}`, name]} />
               <Line type="monotone" dataKey="value" name={metric.label} stroke={isWeight ? "#3a5f80" : "#5aa9e6"} strokeWidth={isWeight ? 1 : 2.5} dot={{ r: 2.5, fill: "#5aa9e6" }} connectNulls isAnimationActive={false} />
               {isWeight && <Line type="monotone" dataKey="trend" name="trend" stroke="#5aa9e6" strokeWidth={2.5} dot={false} connectNulls isAnimationActive={false} />}
-              {isWeight && <Line dataKey="ignored" name="ignored" stroke="none" dot={{ r: 3.5, fill: "#5b6472" }} isAnimationActive={false} />}
+              {isWeight && <Line dataKey="ignored" name="ignored" stroke="none" dot={{ r: 3.5, fill: "var(--faint)" }} isAnimationActive={false} />}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
