@@ -788,6 +788,10 @@
         "status=completed",
         "finishedAt=now"
       ]
+    },
+    {
+      "at": "2026-09-26T22:37:08.367Z",
+      "note": "Decision: bug screenshots referenced in REPORT.md are copied to tests/personas/report-assets/ as JPEG at 0.6 scale (450x974, q0.8) to keep the repo small (13 MB PNG -> 3.9 MB); originals stay in the git-ignored run3/out."
     }
   ]
 }
