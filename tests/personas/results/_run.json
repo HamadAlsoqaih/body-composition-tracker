@@ -108,8 +108,10 @@
       "finishedAt": "2026-09-26T21:13:01.832Z"
     },
     "p17": {
-      "status": "pending",
-      "attempts": 0
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T21:53:14.529Z",
+      "agent": "a6bcfd7a397099b2f"
     },
     "p18": {
       "status": "pending",
@@ -641,6 +643,16 @@
         "attempts=1",
         "startedAt=now",
         "agent=a9c660e8962578acf"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:53:14.533Z",
+      "id": "p17",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a6bcfd7a397099b2f"
       ]
     }
   ]
