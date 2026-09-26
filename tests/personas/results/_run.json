@@ -1,0 +1,447 @@
+{
+  "startedAt": "2026-09-26T20:29:07.846Z",
+  "personas": {
+    "p01": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.046Z",
+      "agent": "aa5a84d8696ba8904"
+    },
+    "p02": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.491Z",
+      "agent": "aeba0235e5c5c2715"
+    },
+    "p03": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.095Z",
+      "agent": "a51c912ce828227f8"
+    },
+    "p04": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p05": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.536Z",
+      "agent": "a59bc67b922a8337e"
+    },
+    "p06": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.143Z",
+      "agent": "aa189a12f2e121c6d"
+    },
+    "p07": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p08": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p09": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.190Z",
+      "agent": "a7864ffef2d4ab28e"
+    },
+    "p10": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p11": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.256Z",
+      "agent": "a88a95c84f18b0291"
+    },
+    "p12": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p13": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p14": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p15": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p16": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.307Z",
+      "agent": "abfbe8f542cc246d2"
+    },
+    "p17": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p18": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p19": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p20": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p21": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p22": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p23": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p24": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.369Z",
+      "agent": "a89df06973d22feaf"
+    },
+    "p25": {
+      "status": "pending",
+      "attempts": 0
+    },
+    "p26": {
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T20:29:54.433Z",
+      "agent": "a8461412a07f32f00"
+    }
+  },
+  "events": [
+    {
+      "at": "2026-09-26T20:29:07.846Z",
+      "note": "run-start run3 started; smoke test p06 passed (run2); parallelism start 10"
+    },
+    {
+      "at": "2026-09-26T20:29:07.894Z",
+      "id": "p01",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:07.941Z",
+      "id": "p02",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:07.990Z",
+      "id": "p03",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.036Z",
+      "id": "p04",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.088Z",
+      "id": "p05",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.137Z",
+      "id": "p06",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.183Z",
+      "id": "p07",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.227Z",
+      "id": "p08",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.273Z",
+      "id": "p09",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.320Z",
+      "id": "p10",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.373Z",
+      "id": "p11",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.417Z",
+      "id": "p12",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.463Z",
+      "id": "p13",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.507Z",
+      "id": "p14",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.554Z",
+      "id": "p15",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.600Z",
+      "id": "p16",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.648Z",
+      "id": "p17",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.695Z",
+      "id": "p18",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.745Z",
+      "id": "p19",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.793Z",
+      "id": "p20",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.843Z",
+      "id": "p21",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.892Z",
+      "id": "p22",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:08.951Z",
+      "id": "p23",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:09.002Z",
+      "id": "p24",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:09.049Z",
+      "id": "p25",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:09.099Z",
+      "id": "p26",
+      "set": [
+        "status=pending",
+        "attempts=0"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.046Z",
+      "id": "p01",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=aa5a84d8696ba8904"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.095Z",
+      "id": "p03",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a51c912ce828227f8"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.143Z",
+      "id": "p06",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=aa189a12f2e121c6d"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.190Z",
+      "id": "p09",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a7864ffef2d4ab28e"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.256Z",
+      "id": "p11",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a88a95c84f18b0291"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.307Z",
+      "id": "p16",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=abfbe8f542cc246d2"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.369Z",
+      "id": "p24",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a89df06973d22feaf"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.434Z",
+      "id": "p26",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a8461412a07f32f00"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.491Z",
+      "id": "p02",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=aeba0235e5c5c2715"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.537Z",
+      "id": "p05",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a59bc67b922a8337e"
+      ]
+    },
+    {
+      "at": "2026-09-26T20:29:54.580Z",
+      "note": "parallelism 10 initial wave"
+    }
+  ]
+}
