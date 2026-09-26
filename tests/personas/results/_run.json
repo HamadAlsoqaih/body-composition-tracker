@@ -608,6 +608,10 @@
         "startedAt=now",
         "agent=aa2a9cf0d7119855e"
       ]
+    },
+    {
+      "at": "2026-09-26T21:41:07.254Z",
+      "note": "Decision: with 7 agents in their scripted phase CPU idle fell to 16-19% (<20% headroom). Rule from now: when a persona finishes, re-measure idle over 30s and launch a replacement only if idle >= 25%; otherwise run with one fewer."
     }
   ]
 }
