@@ -1,6 +1,83 @@
-import React, { useState } from "react";
-import { Sheet, download } from "./ui.jsx";
+import React, { useMemo, useState } from "react";
+import { Sheet, download, shareOrDownload } from "./ui.jsx";
 import { buildBackup, validateBackup, mergeStates, weightsCSV, measurementsCSV, foodCSV, countsOf, CORRUPT_PREFIX } from "../lib/storage.js";
+import { buildDailyExport, dailyExportSummary, dailyExportFilename } from "../lib/export.js";
+import { addDays } from "../lib/dates.js";
+
+const DAILY_RANGES = [
+  { key: "all", label: "All data" },
+  { key: "7", label: "Last 7 days" },
+  { key: "30", label: "Last 30 days" },
+  { key: "90", label: "Last 90 days" },
+  { key: "custom", label: "Custom" },
+];
+
+/** Readable day-by-day export for analysis (not a backup; Import won't accept it). */
+function DailyExport({ state, today }) {
+  const [mode, setMode] = useState("all");
+  const [from, setFrom] = useState(addDays(today, -29));
+  const [to, setTo] = useState(today);
+  const [includeEntries, setIncludeEntries] = useState(false);
+
+  const range = useMemo(() => {
+    if (mode === "all") return {};
+    if (mode === "custom") {
+      if (!from || !to) return { error: "Choose a start and end date." };
+      if (from > to) return { error: "The start date must be on or before the end date." };
+      return { from, to };
+    }
+    return { from: addDays(today, -(Number(mode) - 1)), to: today };
+  }, [mode, from, to, today]);
+
+  const preview = useMemo(() => {
+    if (range.error) return null;
+    try {
+      return dailyExportSummary(buildDailyExport(state, { from: range.from, to: range.to }));
+    } catch {
+      return null;
+    }
+  }, [state, range]);
+
+  const empty = !preview || preview.days === 0;
+
+  const doExport = () => {
+    if (empty) return;
+    const exp = buildDailyExport(state, { from: range.from, to: range.to, includeEntries });
+    shareOrDownload(dailyExportFilename(exp), JSON.stringify(exp, null, 2));
+  };
+
+  return (
+    <>
+      <div className="detlabel" style={{ marginTop: 16 }}>Daily data export</div>
+      <p className="subtle" style={{ marginBottom: 8 }}>One entry per day with data, in kg, cm, kcal and g — for spreadsheets or analysis. This isn't a backup and can't be imported.</p>
+      <div className="chips">
+        {DAILY_RANGES.map((r) => (
+          <button key={r.key} className={`chip${mode === r.key ? " on" : ""}`} onClick={() => setMode(r.key)}>{r.label}</button>
+        ))}
+      </div>
+      {mode === "custom" && (
+        <div className="tapegrid">
+          <label className="fld"><span>From</span><input type="date" value={from} max={today} onChange={(e) => setFrom(e.target.value)} /></label>
+          <label className="fld"><span>To</span><input type="date" value={to} max={today} onChange={(e) => setTo(e.target.value)} /></label>
+        </div>
+      )}
+      <label className="toggle">
+        <span>Include individual food entries</span>
+        <input type="checkbox" checked={includeEntries} onChange={(e) => setIncludeEntries(e.target.checked)} />
+      </label>
+      {range.error ? (
+        <div className="banner warn">{range.error}</div>
+      ) : empty ? (
+        <p className="subtle">No data in this range.</p>
+      ) : (
+        <p className="subtle">
+          {preview.from} → {preview.to} · {preview.days} day{preview.days === 1 ? "" : "s"} with data · {preview.weighInDays} weigh-in day{preview.weighInDays === 1 ? "" : "s"} · {preview.foodDays} food day{preview.foodDays === 1 ? "" : "s"} · {preview.tapeDays} tape day{preview.tapeDays === 1 ? "" : "s"}
+        </p>
+      )}
+      <button className="btnsm primary" style={{ marginTop: 8 }} disabled={empty || !!range.error} onClick={doExport}>Export daily data (JSON)</button>
+    </>
+  );
+}
 
 function Counts({ c }) {
   return (
@@ -67,6 +144,8 @@ export default function DataSheet({ state, today, corrupt, persist, iosHint, onR
         <button className="btnsm" onClick={() => download(`bodytracker-food-${today}.csv`, foodCSV(state.food, state.days), "text/csv")}>Food CSV</button>
         <button className="btnsm" onClick={() => download(`bodytracker-measurements-${today}.csv`, measurementsCSV(state.entries), "text/csv")}>Measurements CSV</button>
       </div>
+
+      <DailyExport state={state} today={today} />
 
       <div className="detlabel" style={{ marginTop: 16 }}>Import a backup</div>
       <input type="file" accept="application/json,.json" onChange={onFile} />

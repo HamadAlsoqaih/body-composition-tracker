@@ -8,6 +8,12 @@
 - **Deploys ran without tests.** The GitHub Pages workflow now runs `npm test` after `npm ci` and before `npm run build`.
 - **Initial water variance ignored tuning.** The filter started the water state at a fixed 0.6² variance. It now starts at the water SD² in use (tuned or default) unless `initWVar` is passed explicitly. Default runs are unchanged (0.6² = 0.36).
 
+### New: daily data export
+- `buildDailyExport(state, { from, to, includeEntries })` in `src/lib/export.js`: a readable day-by-day JSON file (always metric), with one object per date that has data and fields only where data exists. Format in the README.
+- "Export daily data (JSON)" in the data sheet: All data / last 7, 30, 90 days / custom range with validation, an "Include individual food entries" toggle, a preview of the day counts, share sheet where supported (otherwise a download), and file name `bodytracker-daily_<from>_to_<to>.json`.
+- The full backup is unchanged and is still the only file Import accepts; Import now explains when it's given a daily export instead.
+- Export tests run under both test time zones (the `npm test` script's New York run now includes `tests/export.test.js`).
+
 Accuracy scenarios before → after the water-variance fix (1,000 runs unless noted):
 
 | Scenario | Requirement | Averaged tuning (default) | Best-fit-only tuning |

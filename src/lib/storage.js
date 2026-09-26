@@ -307,6 +307,7 @@ export function validateBackup(input, today = localDateString()) {
   }
   const errors = [];
   if (!obj || typeof obj !== "object" || Array.isArray(obj)) return { ok: false, errors: ["Expected a BodyTracker backup object."] };
+  if (obj.exportType === "daily") return { ok: false, errors: ["This is a daily data export, not a backup. Import needs a full backup (JSON) file."] };
   if (!("entries" in obj) && !("food" in obj)) errors.push("No entries or food data found.");
   if ("entries" in obj && !Array.isArray(obj.entries)) errors.push("`entries` must be a list.");
   if ("food" in obj && !Array.isArray(obj.food)) errors.push("`food` must be a list.");

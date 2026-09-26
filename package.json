@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "cross-env TZ=Asia/Riyadh vitest run && cross-env TZ=America/New_York vitest run tests/dates.test.js",
+    "test": "cross-env TZ=Asia/Riyadh vitest run && cross-env TZ=America/New_York vitest run tests/dates.test.js tests/export.test.js",
     "test:watch": "vitest",
     "deploy": "npm run build && gh-pages -d dist"
   },

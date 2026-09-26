@@ -13,6 +13,7 @@ A private, mobile-first web app for tracking weight, body composition and nutrit
 - **Food log** — several entries per day, edit/delete, a per-day "complete" flag, and optional water-event tags (high salt, refeed, creatine start, hard training, menstrual cycle, illness, travel).
 - **Explain the math** — every number the app shows, with the exact inputs used.
 - **Backup** — full JSON backup, CSV export (weights, food, measurements), validated JSON import with a preview and replace/merge.
+- **Daily data export** — a readable day-by-day JSON file for analysis (see *Daily data export* below).
 
 ## Run locally
 
@@ -23,7 +24,7 @@ npm test         # unit + accuracy tests (Vitest)
 npm run build    # production build into dist/
 ```
 
-`npm test` runs the whole suite with `TZ=Asia/Riyadh`, then re-runs the date tests with `TZ=America/New_York`. The time zone is set with `cross-env`, so the script works in PowerShell/CMD as well as Unix shells. The GitHub Pages workflow runs `npm test` before every build, so a failing test blocks the deploy.
+`npm test` runs the whole suite with `TZ=Asia/Riyadh`, then re-runs the date and daily-export tests with `TZ=America/New_York`. The time zone is set with `cross-env`, so the script works in PowerShell/CMD as well as Unix shells. The GitHub Pages workflow runs `npm test` before every build, so a failing test blocks the deploy.
 
 ## Deploy to GitHub Pages
 
@@ -47,6 +48,7 @@ All calculations are pure functions in `src/lib/`; components only render and ca
 | `guardrails.js` | Safety rules |
 | `composition.js` | First-3 vs last-3 composition analysis, US Navy estimate |
 | `storage.js` | Safe storage, schema migration, backup/import/CSV |
+| `export.js` | Day-by-day JSON export for analysis |
 | `analysis.js` | Orchestrator: builds the one model object the UI and "Explain the math" both read |
 | `progress.js` | Ring/delta display helpers |
 
@@ -118,6 +120,43 @@ weigh-in y = M + W + v,  v ~ N(0, 0.2²)
 - Schema version 3, with automatic migration of the original data (`bt_entries`, `bt_food`, `bt_settings`, `bt_goals`). Old one-per-day food rows become one entry on that day, marked complete, and a raw copy of the old data is kept in `bt_v1_backup`. Version 3 removes the "bia" source that version 2 put on weight-only entries (the pre-migration copy is kept in `bt_v2_backup`). Old settings may contain the former hidden defaults (height 175, age 25, activity 1.45), so migrated users are asked once to confirm their profile.
 - Every storage read and write is wrapped. Unreadable data is kept aside (`bt_corrupt_*`) and offered for download from the data screen, and an error screen lets you download raw data if rendering ever fails.
 - `navigator.storage.persist()` is requested on first load. A backup reminder appears every 30 days. iOS users are told to add the app to the Home Screen, because Safari can delete site data after 7 days without use.
+
+## Daily data export
+
+**Your data → Daily data export** writes a day-by-day JSON file for spreadsheets or analysis. It's separate from the full backup: the backup format is unchanged and remains the only file Import accepts (Import rejects a daily export with an explanation).
+
+- **Range:** All data (default: first to last date with any data), last 7 / 30 / 90 days, or custom dates. Both ends are inclusive local dates.
+- **Days:** one object per date that has a weigh-in, food entry, composition value or tape measurement, sorted by date. Days with nothing are omitted.
+- **Fields:** a field appears only when there's data (no nulls; a logged 0 stays 0). Always metric, whatever the display units: kg / cm / % to 1 decimal, kcal and g as whole numbers.
+- **Options:** "Include individual food entries" (off by default). The screen shows a preview of the range and the counts of weigh-in, food and tape days first. The file is named `bodytracker-daily_<from>_to_<to>.json` and is offered through the share sheet where the browser supports sharing files, otherwise downloaded.
+
+```jsonc
+{
+  "app": "BodyTracker",
+  "exportType": "daily",
+  "schemaVersion": 3,
+  "exportedAt": "2026-09-26T21:15:03+03:00",   // local time with UTC offset
+  "timezone": "Asia/Riyadh",
+  "units": { "weight": "kg", "length": "cm", "energy": "kcal", "macros": "g" },
+  "range": { "from": "2026-09-01", "to": "2026-09-03", "daysWithData": 3 },
+  "days": [
+    {
+      "date": "2026-09-02",
+      "weight": 92.1,                                   // the model's daily value (earliest weigh-in, or mean for untimed entries)
+      "weighIns": [{ "time": "07:05", "weight": 92.1 }, { "time": "20:30", "weight": 91.5 }],   // only if > 1 that day
+      "weightIgnored": true,                            // only if flagged as an outlier
+      "composition": { "source": "bia", "bodyFat": 27.9, "fatMass": 25.7, "muscleMass": 37.9 },   // latest composition entry that day; present fields only (for DEXA, muscleMass is lean mass)
+      "tape": { "neck": 40, "waist": 100.4 },           // latest entry per measurement; waist = mean of its 2–3 readings
+      "food": {
+        "calories": 2101, "protein": 155, "carbs": 210, "fat": 68,   // day totals; a macro only if logged on every entry that day
+        "complete": true,
+        "entries": [{ "label": "Breakfast", "calories": 600, "protein": 45, "carbs": 60, "fat": 18 }]   // only with the toggle on
+      },
+      "waterTags": ["high salt"]                        // only if tagged
+    }
+  ]
+}
+```
 
 ## Accuracy tests
 

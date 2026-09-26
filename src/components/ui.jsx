@@ -89,6 +89,26 @@ export function download(filename, text, type = "application/json") {
   }
 }
 
+/**
+ * Offer a file through the system share sheet when the browser can share
+ * files; otherwise fall back to a normal download. Returns true if handed off.
+ */
+export async function shareOrDownload(filename, text, type = "application/json") {
+  try {
+    if (typeof File !== "undefined" && navigator.canShare) {
+      const file = new File([text], filename, { type });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: filename });
+        return true;
+      }
+    }
+  } catch (e) {
+    if (e && e.name === "AbortError") return false; // user closed the share sheet
+    // any other share error: fall back to a download
+  }
+  return download(filename, text, type);
+}
+
 export const RANGES = [
   { key: "1m", label: "1M", months: 1 },
   { key: "3m", label: "3M", months: 3 },
