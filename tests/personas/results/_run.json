@@ -80,8 +80,10 @@
       "agent": "ae03531b51a0f30d8"
     },
     "p13": {
-      "status": "pending",
-      "attempts": 0
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T21:24:50.139Z",
+      "agent": "af7ddda87efbdee5e"
     },
     "p14": {
       "status": "pending",
@@ -575,6 +577,16 @@
     {
       "at": "2026-09-26T21:24:39.708Z",
       "note": "Decision: p06 and p16 each lost one day because their own helper scripts called nextday after a failed step. Added one line to AGENT_BRIEF.md (scripts must stop on failure and verify the day before nextday) for personas launched from now on (p13 onward); harness-only change. The missed days are kept as realistic missed days."
+    },
+    {
+      "at": "2026-09-26T21:24:50.139Z",
+      "id": "p13",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=af7ddda87efbdee5e"
+      ]
     }
   ]
 }
