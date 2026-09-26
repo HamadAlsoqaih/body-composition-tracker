@@ -442,6 +442,10 @@
     {
       "at": "2026-09-26T20:29:54.580Z",
       "note": "parallelism 10 initial wave"
+    },
+    {
+      "at": "2026-09-26T20:34:37.058Z",
+      "note": "decision load 7.0 on 4 cores with 10 personas (CPU mostly per-command node CLI startup + chromium); memory fine. Hold further launches until load average < 3.2; replace finished personas only while under target. Running agents are not stopped (would lose their context)."
     }
   ]
 }
