@@ -116,8 +116,10 @@
       "agent": "a6bcfd7a397099b2f"
     },
     "p18": {
-      "status": "pending",
-      "attempts": 0
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T22:01:25.391Z",
+      "agent": "adc2126c3ac9532fc"
     },
     "p19": {
       "status": "skipped",
@@ -727,6 +729,16 @@
     {
       "at": "2026-09-26T22:01:15.809Z",
       "note": "p12: persona wanted plan ~450 kcal in week 7 but the simulator's plan floor (500 kcal) clamped it to 520; harness limitation, recorded for the report."
+    },
+    {
+      "at": "2026-09-26T22:01:25.391Z",
+      "id": "p18",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=adc2126c3ac9532fc"
+      ]
     }
   ]
 }
