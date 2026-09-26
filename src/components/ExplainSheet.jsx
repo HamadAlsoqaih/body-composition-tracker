@@ -113,7 +113,7 @@ export default function ExplainSheet({ m, units, onClose }) {
             Goal: <b>{t.dir}</b>{t.requestedDir !== t.dir && <> (you chose {t.requestedDir}; changed for safety)</>}{t.dir !== "maintain" && <> at <b>{t.ratePct}%</b> of body weight per week</>}.
             <br /><span className="mono">{t.ratePct}% × {W(m.trendWeight)} trend × {fmtInt(m.energy.energyPerKg)} kcal/kg ÷ 7 = {fmtInt(Math.abs(t.delta))} kcal/day</span>
             <br /><span className="mono">{fmtInt(k.tdee.tdee)} {t.delta < 0 ? "−" : "+"} {fmtInt(Math.abs(t.delta))} = {fmtInt(t.mathTarget)} kcal/day</span>
-            <br />Minimum suggested: {fmtInt(t.floor.floor)} kcal/day (the larger of BMR {fmtInt(t.bmr?.bmr)} and {m.prior.inputs.sex === "female" ? "1,200" : "1,500"}).{t.floor.capped ? " The target was raised to this minimum." : ""}
+            <br />Minimum suggested: {fmtInt(t.floor.floor)} kcal/day (the larger of BMR {fmtInt(t.bmr?.bmr)} and {m.person.sex === "female" ? "1,200" : "1,500"}).{t.floor.capped ? " The target was raised to this minimum." : ""}
             {t.status && <><br />On track means your target rate ({W(t.rateKgDay * 7, 2)}/week) falls inside the 95% range of your measured rate. {t.status.onTrack ? "It does." : `It doesn't; closing the gap needs about ${fmtInt(Math.abs(t.status.adjustKcal))} kcal/day ${t.status.adjustKcal < 0 ? "less" : "more"}.`}</>}
           </>
         )}

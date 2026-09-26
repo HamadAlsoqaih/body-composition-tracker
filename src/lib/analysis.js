@@ -82,6 +82,7 @@ export function computeModel(state, today = localDateString()) {
 
   const out = {
     today,
+    person,
     missing,
     cleaning: { ...cleaning, used: clean.length, ignored: cleaning.points.filter((p) => p.outlier).length, kalmanIgnored: [] },
     trend,

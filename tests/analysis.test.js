@@ -40,6 +40,10 @@ describe("computeModel", () => {
     expect(m.targets.status).not.toBeNull();
   });
 
+  it("exposes the profile used (formula sex for the calorie floor)", () => {
+    expect(m.person).toEqual({ heightCm: 180, age: 35, sex: "male" });
+  });
+
   it("regression cross-check runs at the snapshot", () => {
     expect(m.regression.ok).toBe(true);
     expect(m.agreement).not.toBeNull();
