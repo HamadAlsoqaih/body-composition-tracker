@@ -6,6 +6,12 @@ import {
 
 const TZ = process.env.TZ;
 
+describe("time zone", () => {
+  it("TZ from the npm test script took effect", () => {
+    expect(Intl.DateTimeFormat().resolvedOptions().timeZone).toBe(process.env.TZ);
+  });
+});
+
 describe("localDateString", () => {
   it("uses the local calendar date at 00:30 local (not UTC)", () => {
     const d = new Date(2026, 8, 26, 0, 30); // 26 Sep 2026 00:30 local
