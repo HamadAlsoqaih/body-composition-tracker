@@ -14,8 +14,9 @@ const { chromium } = require(path.join(execSync("npm root -g").toString().trim()
 const APP = process.env.APP_URL || "http://localhost:4173/";
 const PORT = Number(process.env.PORT || 7700);
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
-const OUT = path.join(ROOT, "out");
-const TRUTH = path.join(ROOT, ".truth");
+const RUN = path.join(ROOT, process.env.RUN_NAME || "run3");
+const OUT = path.join(RUN, "out"); // persona-visible: screenshots, downloads, journal, own scripts
+const TRUTH = path.join(RUN, ".truth"); // orchestrator-only: ground truth, storage, metrics
 const IPHONE_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
 
 const browser = await chromium.launch();
@@ -84,43 +85,109 @@ async function persist(id) {
   await e.ctx.storageState({ path: e.storageFile });
 }
 
-// ---------- screen reading ----------
+// ---------- screen reading (only what a person can see) ----------
 async function topLayer(page) {
   const layers = page.locator(".welcomecard, .sheetinner");
   const n = await layers.count();
   return n ? layers.nth(n - 1) : page.locator(".app");
 }
 
-async function notices(page) {
+/**
+ * The text a person can see right now: text inside the viewport, in the top
+ * window (an open panel/popup, else the page), in reading order. Form fields
+ * show their typed value or placeholder, checkboxes show ☑/☐. No structure,
+ * roles, storage, network or console.
+ */
+async function visibleText(page) {
   return page.evaluate(() => {
-    const t = (s) => [...document.querySelectorAll(s)].map((e) => e.innerText.trim().replace(/\s+/g, " ")).filter(Boolean);
-    return {
-      popup: t(".welcomecard h2"),
-      sheet: t(".sheetinner h2"),
-      banners: t(".banner"),
-      insights: t(".insight"),
-      recommendation: t(".reccard .rectext"),
-    };
+    const layers = document.querySelectorAll(".welcomecard, .sheetinner");
+    const root = layers.length ? layers[layers.length - 1] : document.querySelector(".app") || document.body;
+    const vw = innerWidth, vh = innerHeight;
+    const onScreen = (r) => r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
+    const shown = (el) => { for (let e = el; e && e !== document.body; e = e.parentElement) { const cs = getComputedStyle(e); if (cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return false; } return true; };
+    // the fixed bottom bar and header of the page stay visible under nothing else
+    const roots = [root];
+    if (!layers.length) { const bar = document.querySelector(".bottombar"); if (bar) roots.push(bar); }
+    const items = [];
+    for (const r0 of roots) {
+      const walker = document.createTreeWalker(r0, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+      for (let n = walker.currentNode; n; n = walker.nextNode()) {
+        if (n.nodeType === 1) {
+          const el = n;
+          if (r0 === root && el.closest(".bottombar") && roots.length > 1) continue;
+          if (["INPUT", "SELECT", "TEXTAREA"].includes(el.tagName)) {
+            const rc = el.getBoundingClientRect();
+            if (!onScreen(rc) || !shown(el)) continue;
+            let t;
+            if (el.type === "checkbox") t = el.checked ? "☑" : "☐";
+            else if (el.type === "file") t = "[Choose File]";
+            else if (el.tagName === "SELECT") t = `[${el.options[el.selectedIndex]?.text ?? ""} ▾]`;
+            else t = el.value ? `[${el.value}]` : `[${el.placeholder || " "}]`;
+            items.push({ y: rc.top + rc.height / 2, x: rc.left, w: rc.width, t });
+          }
+          continue;
+        }
+        if (!n.textContent.trim()) continue;
+        const el = n.parentElement;
+        if (!el || !shown(el)) continue;
+        // word by word, so wrapped text is read in visual order
+        const range = document.createRange();
+        const str = n.textContent;
+        const re = /\S+/g;
+        let m;
+        while ((m = re.exec(str))) {
+          range.setStart(n, m.index);
+          range.setEnd(n, m.index + m[0].length);
+          const rc = range.getBoundingClientRect();
+          if (!onScreen(rc)) continue;
+          items.push({ y: rc.top + rc.height / 2, x: rc.left, w: rc.width, t: m[0], el });
+        }
+      }
+    }
+    // group words into visual lines, then left-to-right; a wide gap or a new element starts a new chunk
+    items.sort((a, b) => a.y - b.y);
+    const rows = [];
+    for (const it of items) {
+      const row = rows.find((r) => Math.abs(r.y - it.y) < 7);
+      if (row) row.items.push(it); else rows.push({ y: it.y, items: [it] });
+    }
+    rows.sort((a, b) => a.y - b.y);
+    const lines = rows.map((r) => {
+      r.items.sort((a, b) => a.x - b.x);
+      let out = "", prev = null;
+      for (const it of r.items) {
+        if (prev) out += it.x - (prev.x + (prev.w || 0)) > 24 ? "  |  " : " ";
+        out += it.t;
+        prev = it;
+      }
+      return out;
+    });
+    return lines;
   });
 }
 
 async function look(page, id) {
-  const layer = await topLayer(page);
-  let snap = await layer.ariaSnapshot().catch(() => "");
-  const lines = snap.split("\n");
-  if (lines.length > 160) snap = lines.slice(0, 160).join("\n") + `\n… (${lines.length - 160} more lines — scroll or use 'find')`;
+  const lines = await visibleText(page);
   const shot = path.join(dir(OUT, id), "screens", `${Date.now()}.png`);
   fs.mkdirSync(path.dirname(shot), { recursive: true });
   await page.screenshot({ path: shot });
-  return `${snap}\n[screenshot: ${shot}]`;
+  return `${lines.join("\n")}\n[screenshot: ${shot}]`;
 }
 
-// find a tappable thing by its visible name, inside the top layer
+// find a tappable thing by the words on it, inside the top window.
+// Order: exact accessible name → exact visible words → whole-word matches (never substrings,
+// so "Lose" can't match the ✕ button called "Close").
+const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 async function target(page, name, nth = 0, roles = ["button", "checkbox", "link", "tab", "radio"]) {
   const layer = await topLayer(page);
+  const scopes = [layer];
+  if (!(await page.locator(".welcomecard, .sheetinner").count())) scopes.push(page.locator(".bottombar"));
+  const word = new RegExp(`(^|\\W)${esc(name)}($|\\W)`, "i");
   const tries = [];
-  for (const exact of [true, false]) for (const role of roles) tries.push(layer.getByRole(role, { name, exact }));
-  tries.push(layer.getByText(name, { exact: true }), layer.getByText(name));
+  for (const sc of scopes) for (const role of roles) tries.push(sc.getByRole(role, { name, exact: true }));
+  for (const sc of scopes) tries.push(sc.getByText(name, { exact: true }));
+  for (const sc of scopes) for (const role of roles) tries.push(sc.getByRole(role, { name: word }));
+  for (const sc of scopes) tries.push(sc.getByText(word));
   for (const loc of tries) {
     const vis = loc.filter({ visible: true });
     if ((await vis.count()) > nth) return vis.nth(nth);
@@ -134,14 +201,17 @@ async function field(page, label, nth = 0) {
     const vis = loc.filter({ visible: true });
     if ((await vis.count()) > nth) return vis.nth(nth);
   }
-  // hidden-by-scroll fields are still fillable
-  for (const loc of [layer.getByLabel(label), layer.getByPlaceholder(label)]) if ((await loc.count()) > nth) return loc.nth(nth);
   return null;
 }
 
+// words on the buttons a person can currently see (for "couldn't find it" messages)
 async function visibleButtons(page) {
-  const layer = await topLayer(page);
-  return (await layer.getByRole("button").allInnerTexts()).map((s) => s.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 40);
+  return page.evaluate(() => {
+    const layers = document.querySelectorAll(".welcomecard, .sheetinner");
+    const root = layers.length ? layers[layers.length - 1] : document;
+    return [...root.querySelectorAll("button")].filter((b) => { const r = b.getBoundingClientRect(); return r.width > 0 && r.bottom > 0 && r.top < innerHeight; })
+      .map((b) => (b.innerText || b.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 40);
+  });
 }
 
 // ---------- commands ----------
@@ -153,7 +223,7 @@ async function run(id, cmd, args) {
   let out = "";
   e.dialogs = [];
   e.downloads = [];
-  const before = JSON.stringify(await notices(page).catch(() => ({})));
+  const before = new Set(await visibleText(page).catch(() => []));
   switch (cmd) {
     case "look":
       out = await look(page, id);
@@ -216,18 +286,6 @@ async function run(id, cmd, args) {
       out = `scrolled ${where}`;
       break;
     }
-    case "find": {
-      const layer = await topLayer(page);
-      const txt = await layer.innerText();
-      const hits = txt.split("\n").filter((l) => l.toLowerCase().includes(String(args[0]).toLowerCase()));
-      out = hits.length ? hits.join("\n") : `"${args[0]}" is not on this screen`;
-      break;
-    }
-    case "read": {
-      const layer = await topLayer(page);
-      out = (await layer.innerText()).replace(/\n{3,}/g, "\n\n");
-      break;
-    }
     case "time": {
       // time HH:MM [next] — the clock moves forward to that time today (or after midnight)
       const date = args[1] === "next" ? sim.addDays(s.date, 1) : s.date;
@@ -245,9 +303,10 @@ async function run(id, cmd, args) {
       saveSim(id, s);
       break;
     case "plan": {
-      sim.setPlan(s, Number(args[0]));
+      sim.setPlan(s, Number(args[0]), args.slice(1).join(" "));
       saveSim(id, s);
-      out = `From tomorrow you'll aim to eat about ${args[0]} kcal a day (by your own counting).`;
+      fs.appendFileSync(path.join(dir(TRUTH, id), "plans.log"), `${s.date} day ${s.day + 1}: plan ${args[0]} kcal from tomorrow — ${args.slice(1).join(" ")}\n`);
+      out = `From tomorrow you'll eat about ${args[0]} kcal a day.`;
       break;
     }
     case "nextday": {
@@ -259,7 +318,7 @@ async function run(id, cmd, args) {
       await page.reload();
       await page.waitForTimeout(400);
       saveSim(id, s);
-      out = `— A new day. You open the app. —\n${sim.lifeLog(id, s)}`;
+      out = `— A new day. You open the app. —\n${sim.lifeLog(id, s)}\n— Your phone screen —\n${(await visibleText(page)).join("\n")}`;
       saveSim(id, s);
       break;
     }
@@ -267,21 +326,16 @@ async function run(id, cmd, args) {
       out = await look(page, id);
       break;
     default:
-      throw new Error(`unknown command ${cmd}. Commands: look, read, find, tap, tapoutside, fill, check, select, upload, key, scroll, time, day, plan, nextday`);
+      throw new Error(`unknown command ${cmd}. Commands: look, tap, tapoutside, fill, check, select, upload, key, scroll, time, day, plan, nextday`);
   }
   await page.waitForTimeout(200);
-  const after = await notices(page).catch(() => ({}));
   const extra = [];
   if (e.dialogs.length) extra.push(`[the app asked] ${e.dialogs.join(" | ")} → you tapped OK`);
   if (e.downloads.length) extra.push(`[downloaded file] ${e.downloads.join(", ")}`);
-  if (JSON.stringify(after) !== before && cmd !== "look") {
-    const parts = [];
-    if (after.popup?.length) parts.push(`popup: ${after.popup.join(" | ")}`);
-    if (after.sheet?.length) parts.push(`open panel: ${after.sheet.join(" | ")}`);
-    if (after.banners?.length) parts.push(`banners: ${after.banners.map((b) => b.slice(0, 160)).join(" || ")}`);
-    if (after.recommendation?.length) parts.push(`recommendation: ${after.recommendation.join(" ").slice(0, 300)}`);
-    if (after.insights?.length) parts.push(`notes: ${after.insights.map((b) => b.slice(0, 160)).join(" || ")}`);
-    if (parts.length) extra.push(`[on screen now] ${parts.join("\n  ")}`);
+  if (!["look", "day", "plan", "nextday"].includes(cmd)) {
+    const now = await visibleText(page).catch(() => []);
+    const fresh = now.filter((l) => !before.has(l));
+    if (fresh.length) extra.push(`[new on screen] ${fresh.slice(0, 14).join(" / ").slice(0, 900)}${fresh.length > 14 ? " …" : ""}`);
   }
   log(id, `${cmd} ${JSON.stringify(args)}`);
   await persist(id);
@@ -311,7 +365,6 @@ async function scrape(id, s) {
       await new Promise((r) => setTimeout(r, 150));
       out.composition = txt(document.querySelector(".analysiscard"));
       out.trend = txt([...document.querySelectorAll(".subtle")].find((e) => e.textContent.includes("Trend weight")));
-      out.storage = { entries: JSON.parse(localStorage.getItem("bt_entries") || "[]").length, food: JSON.parse(localStorage.getItem("bt_food") || "[]").length, meta: localStorage.getItem("bt_meta"), settings: localStorage.getItem("bt_settings") };
       return out;
     });
     const truth = { trueTdee: Math.round(sim.trueTdee(sim.PERSONAS[id], s)), fm: s.fm, ffm: s.ffm, weight: s.fm + s.ffm, day: s.day, date: s.date, plan: s.plan };

@@ -1,2 +1,4 @@
 out/
 .truth/
+run*/out/
+run*/.truth/

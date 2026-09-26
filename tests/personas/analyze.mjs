@@ -5,7 +5,8 @@ import path from "node:path";
 import * as sim from "./sim.js";
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
-const TRUTH = path.join(ROOT, ".truth");
+const RUN = path.join(ROOT, process.env.RUN_NAME || "run3");
+const TRUTH = path.join(RUN, ".truth");
 const num = (s) => (s == null ? null : Number(String(s).replace(/,/g, "")));
 
 function parseApp(app) {
@@ -76,7 +77,7 @@ export function analyze(id) {
   const start = s.truthLog[0];
   return {
     id, name: p.name, weeks, firstMeasured, messages: [...seenMsgs.values()],
-    storage: last?.app?.storage, finalComposition: last?.app?.composition,
+    finalComposition: last?.app?.composition,
     trueChange: start && last ? { weight: +(last.truth.weight - p.weight).toFixed(1), fm: +(last.truth.fm - (p.weight * p.bf) / 100).toFixed(1), ffm: +(last.truth.ffm - (p.weight - (p.weight * p.bf) / 100)).toFixed(1) } : null,
     daysSimulated: rows.length,
   };
@@ -103,7 +104,8 @@ if (process.argv[1] && process.argv[1].endsWith("analyze.mjs")) {
   const ids = fs.existsSync(TRUTH) ? fs.readdirSync(TRUTH).filter((d) => sim.PERSONAS[d]).sort() : [];
   const results = ids.map(analyze).filter(Boolean);
   const out = { summary: summary(results), personas: results };
-  fs.writeFileSync(path.join(ROOT, "analysis.json"), JSON.stringify(out, null, 2));
+  fs.mkdirSync(path.join(ROOT, "results"), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, "results", "_analysis.json"), JSON.stringify(out, null, 2));
   for (const r of results) {
     const w = r.weeks.at(-1);
     console.log(`${r.id} ${r.name.padEnd(15)} days=${r.daysSimulated} ${w ? `wk${w.week} app=${w.appTdee}±${w.half} ${w.label} true=${w.trueTdee} (logging units ${w.biasTdee}) err=${w.err} inside=${w.inside} target=${w.target} correct≈${w.correctTarget} ok=${w.targetOk}` : "no full week yet"}`);

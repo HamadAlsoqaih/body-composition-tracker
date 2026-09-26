@@ -3,7 +3,10 @@
 // Truth per day:
 //   tissue change = (true intake − true TDEE) / energyPerKg, Hall/Forbes from true fat mass
 //   scale weight  = fat + fat-free mass + water (AR(1), φ 0.6) + event water + time-of-day offset + N(0, 0.2²)
-//   logged intake = true intake × (1 + logging bias) × (1 + N(0, 0.08²))
+//   logged intake = true intake × (1 + logging bias) × (1 + N(0, 0.08²))  (label error)
+// The persona's plan (`plan <kcal> <reason>`) is their TRUE intake from the next day on;
+// the logged numbers are derived from it with the persona's bias and label error.
+// Every random stream comes from one recorded seed per persona (SEEDS), so runs reproduce exactly.
 // True TDEE = baseline + 22 kcal per kg of tissue change (adaptation) + persona drift.
 //
 // The persona agent only ever sees the "life log" text: meals as they would log
@@ -44,7 +47,7 @@ export const hallP = (fm) => 10.4 / (10.4 + fm);
 export const energyPerKg = (fm) => hallP(fm) * 1816 + (1 - hallP(fm)) * 9440;
 
 // ---------- persona ground truth ----------
-// intake = what the person THINKS they eat per day (their own estimate); true = intake / (1 + bias)
+// intake = TRUE mean daily intake at the start; logged = true × (1 + bias) × label error
 const P = (o) => ({
   tz: "Asia/Riyadh", start: "2026-10-04", weeks: 12, bias: 0, waterSD: 0.6, adapt: 22,
   missingMacro: 0.1, completeProb: 0.95, glycogen: null, bia: null, dexa: null, tape: null,
@@ -55,7 +58,7 @@ const weekday = (d, set) => set.includes(dow(d));
 const prob = (p) => (r) => r.u() < p;
 
 export const PERSONAS = {
-  p01: P({ name: "Khalid", sex: "male", age: 34, height: 180, weight: 118, bf: 36, tdee: 2950, intake: 2500 * 0.8, bias: -0.2,
+  p01: P({ name: "Khalid", sex: "male", age: 34, height: 180, weight: 118, bf: 36, tdee: 2950, intake: 2500, bias: -0.2,
     weigh: (d) => weekday(d, [0, 2, 4]), protein: 110, missingMacro: 0.5,
     log: (d, r) => (r.u() < 0.5 ? { mode: "dinner", complete: r.u() < 0.4 } : { mode: "none" }),
     glycogen: -0.9 }),
@@ -66,7 +69,7 @@ export const PERSONAS = {
   p03: P({ name: "Omar", sex: "male", age: 22, height: 178, weight: 74, bf: 24, tdee: 2600, intake: 2600, protein: 80, missingMacro: 0.25,
     recomp: { fmPerDay: -1.5 / 84, ffmPerDay: 1.5 / 84 }, bia: { bfSD: 2.0 },
     tape: { every: 7, sites: { waist: 86, neck: 37, chest: 96, armL: 30, armR: 30.5 }, readings: 1 } }),
-  p04: P({ name: "Faisal", sex: "male", age: 19, height: 185, weight: 62, bf: 12, tdee: 3000, intake: 2900 * 1.15, bias: 0.15, waterSD: 0.5,
+  p04: P({ name: "Faisal", sex: "male", age: 19, height: 185, weight: 62, bf: 12, tdee: 3000, intake: 2900, bias: 0.15, waterSD: 0.5,
     weigh: (d) => !weekday(d, [5, 6]), protein: 110, missingMacro: 0.2, glycogen: 0.5 }),
   p05: P({ name: "Lina", tz: "America/New_York", sex: "female", age: 26, height: 168, weight: 55, bf: 22, tdee: 2250, intake: 2250, waterSD: 0.45,
     protein: 120, weigh: (d, r) => r.u() < 0.9, lateSnack: 0.55 }),
@@ -125,6 +128,10 @@ export const PERSONAS = {
     weigh: (d) => weekday(d, [1, 4]), log: (d, r) => (r.u() < 0.5 ? { mode: "full", complete: r.u() < 0.5 } : { mode: "none" }), glycogen: -0.5 }),
 };
 
+/** One seed per persona (recorded in the report); every random stream derives from it. */
+export const SEEDS = Object.fromEntries(Object.keys(PERSONAS).map((id, i) => [id, 20261004 + 101 * (i + 1)]));
+const sk = (id, tag) => hash(`${SEEDS[id]}:${tag}`);
+
 // ---------- meals ----------
 const TEMPLATES = {
   standard: [["07:30", "Breakfast", 0.25], ["13:00", "Lunch", 0.35], ["16:30", "Snack", 0.1], ["20:00", "Dinner", 0.3]],
@@ -146,8 +153,8 @@ export function initState(id) {
   const fm = (p.weight * p.bf) / 100;
   const s = {
     id, day: 0, date: p.start, fm, ffm: p.weight - fm, fm0: fm, tissue0: p.weight,
-    water: 0.6 * p.waterSD * rng(hash(id)).n(), eventWater: 0, salt: 0,
-    plan: p.intake, planHistory: [{ day: 0, plan: p.intake }], today: null, truthLog: [],
+    water: 0.6 * p.waterSD * rng(sk(id, 'water0')).n(), eventWater: 0, salt: 0, seed: SEEDS[id],
+    plan: p.intake, planHistory: [{ day: 0, date: p.start, plan: p.intake, reason: 'starting intake (persona card)' }], today: null, truthLog: [],
   };
   s.today = makeDay(p, s);
   return s;
@@ -167,12 +174,14 @@ function glycogenOffset(p, day) {
 
 /** Build the day (truth for today's intake + the text the persona sees). */
 function makeDay(p, s) {
-  const r = rng(hash(`${s.id}:${s.day}`));
+  const r = rng(sk(s.id, `day:${s.day}`));
   const date = s.date;
-  const perceivedPlan = s.plan !== p.intake ? s.plan : (p.intakeFn ? p.intakeFn(s.day) : s.plan);
+  // true intake plan: the persona's own latest decision; scripted phases apply only until they decide something
+  const planChanged = s.planHistory.length > 1;
+  const truePlan = planChanged ? s.plan : p.intakeFn ? p.intakeFn(s.day) : s.plan;
   const inRamadan = p.ramadan && s.day >= p.ramadan[0] && s.day < p.ramadan[1];
   const sick = p.sick && s.day >= p.sick[0] && s.day < p.sick[1];
-  let trueIntake = (perceivedPlan / (1 + p.bias)) * (1 + 0.1 * r.n());
+  let trueIntake = truePlan * (1 + 0.1 * r.n());
   if (p.weekendExtra && weekday(date, [0, 6])) trueIntake += p.weekendExtra;
   if (sick) trueIntake = 1000 * (1 + 0.1 * r.n());
   if (inRamadan) trueIntake *= 1.05;
@@ -180,7 +189,7 @@ function makeDay(p, s) {
 
   // meals
   const tpl = inRamadan ? TEMPLATES.ramadan : p.nightShift ? TEMPLATES.night : TEMPLATES[p.meals] || TEMPLATES.standard;
-  const proteinDay = p.protein * (loggedTotal / Math.max(1, perceivedPlan));
+  const proteinDay = p.protein * (loggedTotal / Math.max(1, truePlan * (1 + p.bias)));
   const meals = tpl.map(([time, slot, share]) => {
     const kcal = loggedTotal * share * (1 + 0.15 * r.n());
     const prot = proteinDay * share * (1 + 0.2 * r.n());
@@ -245,7 +254,7 @@ export function advance(id, s) {
   s.ffm += pp * dM;
   if (p.recomp) { s.fm += p.recomp.fmPerDay; s.ffm += p.recomp.ffmPerDay; }
   if (p.pregnancyGainPerDay) s.ffm += p.pregnancyGainPerDay;
-  const r = rng(hash(`${id}:water:${s.day}`));
+  const r = rng(sk(id, `water:${s.day}`));
   const phi = 0.6;
   s.water = phi * s.water + p.waterSD * Math.sqrt(1 - phi * phi) * r.n();
   s.salt = s.salt * 0.5 + ((t.ev && t.ev.salt) || 0);
@@ -286,9 +295,12 @@ export function lifeLog(id, s) {
   return L.join("\n");
 }
 
-export function setPlan(s, kcal) {
+/** The persona decides to eat `kcal` (true intake) from tomorrow; the reason is logged. */
+export function setPlan(s, kcal, reason) {
+  if (!(kcal > 500 && kcal < 8000)) throw new Error("plan must be a daily calorie amount between 500 and 8000");
+  if (!reason || !String(reason).trim()) throw new Error('say why: plan <kcal> "<reason>"');
   s.plan = kcal;
-  s.planHistory.push({ day: s.day, plan: kcal });
+  s.planHistory.push({ day: s.day + 1, date: addDays(s.date, 1), plan: kcal, reason: String(reason).slice(0, 300) });
   return s;
 }
 
@@ -296,7 +308,7 @@ export function setPlan(s, kcal) {
 export function v1History(id) {
   const p = PERSONAS[id];
   const days = p.history;
-  const r = rng(hash(`${id}:history`));
+  const r = rng(sk(id, 'history'));
   let fm = (p.weight * p.bf) / 100 + 1.2, ffm = p.weight - (p.weight * p.bf) / 100 + 0.8, water = 0;
   const entries = [], food = [];
   for (let i = days; i >= 1; i--) {
