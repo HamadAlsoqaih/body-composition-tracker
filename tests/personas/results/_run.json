@@ -59,8 +59,10 @@
       "finishedAt": "2026-09-26T21:18:13.629Z"
     },
     "p10": {
-      "status": "pending",
-      "attempts": 0
+      "status": "running",
+      "attempts": 1,
+      "startedAt": "2026-09-26T21:18:33.113Z",
+      "agent": "a30e34aee16dc58c9"
     },
     "p11": {
       "status": "completed",
@@ -528,6 +530,16 @@
       "set": [
         "status=completed",
         "finishedAt=now"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:18:33.114Z",
+      "id": "p10",
+      "set": [
+        "status=running",
+        "attempts=1",
+        "startedAt=now",
+        "agent=a30e34aee16dc58c9"
       ]
     }
   ]
