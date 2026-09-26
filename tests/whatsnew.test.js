@@ -158,6 +158,18 @@ describe("accessibility", () => {
     expect(document.activeElement).toBe(last);
   });
 
+  it("tapping outside does not close it or mark it as seen", async () => {
+    seed(OLD_DATA);
+    await mount();
+    const backdrop = whatsNew().parentElement;
+    await click(backdrop);
+    expect(whatsNew()).not.toBeNull();
+    expect(JSON.parse(localStorage.getItem("bt_meta")).whatsNewSeen).toBeNull();
+    await unmount();
+    await mount(); // next open: still shown
+    expect(whatsNew()).not.toBeNull();
+  });
+
   it("the ✕ button and Escape both close it (and count as seen)", async () => {
     seed(OLD_DATA);
     await mount();

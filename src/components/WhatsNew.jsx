@@ -6,6 +6,8 @@ const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select
 /**
  * One-time release notes for people who used an earlier version.
  * Accessible modal: focus stays inside, Escape or the ✕ button close it.
+ * Tapping outside does nothing, so the notes can't be dismissed by accident;
+ * only the buttons, ✕ and Escape mark them as seen.
  * profileNext: the profile confirmation comes next (shown as the final button).
  */
 export default function WhatsNew({ profileNext, onDone, onBackup, content = WHATS_NEW }) {
@@ -40,7 +42,7 @@ export default function WhatsNew({ profileNext, onDone, onBackup, content = WHAT
   };
 
   return (
-    <div className="welcome wn-backdrop" onClick={onDone}>
+    <div className="welcome wn-backdrop">
       <div
         ref={ref}
         className="welcomecard wn-card"
@@ -49,7 +51,6 @@ export default function WhatsNew({ profileNext, onDone, onBackup, content = WHAT
         aria-labelledby="wn-title"
         aria-describedby="wn-intro"
         tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
         onKeyDown={onKeyDown}
       >
         <button className="x wn-close" onClick={onDone} aria-label="Close what's new">✕</button>

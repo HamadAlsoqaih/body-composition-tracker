@@ -13,7 +13,7 @@
 - A "Make a backup" button opens the backup screen.
 - Order: What's new first, then the one-time profile confirmation for existing users (the popup ends with "Next: confirm your profile" when that step is pending). Only one of these screens is shown at a time; after the backup screen closes, the profile step follows.
 - Versioned: the last dismissed release is stored as `meta.whatsNewSeen` (e.g. "2.1"), and the text lives in `src/content/whats-new.json`. A future update shows its own popup by replacing that content and raising its version. New users and old installs with empty data start as up to date and never see it; closing the app before dismissing keeps it pending.
-- Accessible: labelled modal dialog, focus moves into it and is trapped while open, closes with a ✕ button, "Done"/"Next" or Escape, scrolls on small phones (tested at 320 px wide), dark theme.
+- Accessible: labelled modal dialog, focus moves into it and is trapped while open, closes with a ✕ button, "Done"/"Next" or Escape (tapping outside does nothing, so it can't be dismissed by accident), scrolls on small phones (tested at 320 px wide), dark theme.
 - Tests render the app in jsdom (new devDependency) to check who sees it, the order with the profile step, the backup button, dismissal and focus handling.
 
 ### New: daily data export
