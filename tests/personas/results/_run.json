@@ -812,8 +812,12 @@
       ]
     },
     {
-      "at": "2026-09-26T22:50:00.000Z",
+      "at": "2026-09-26T22:44:00.000Z",
       "note": "Re-ran finalize for all completed personas after the final-day scrape (days now counted as state.day+1). finishedAt restored to each persona's original finish time (from the first committed results file) after the re-run had overwritten it; finalize now keeps an existing finishedAt."
+    },
+    {
+      "at": "2026-09-26T22:48:54.000Z",
+      "note": "REPORT.md written and committed; run complete (21 completed, 0 failed, 5 skipped by choice)."
     }
   ]
 }
