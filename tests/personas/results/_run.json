@@ -2,10 +2,11 @@
   "startedAt": "2026-09-26T20:29:07.846Z",
   "personas": {
     "p01": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.046Z",
-      "agent": "aa5a84d8696ba8904"
+      "agent": "aa5a84d8696ba8904",
+      "finishedAt": "2026-09-26T20:48:06.640Z"
     },
     "p02": {
       "status": "running",
