@@ -118,11 +118,11 @@
       "attempts": 0
     },
     "p19": {
-      "status": "pending",
+      "status": "skipped",
       "attempts": 0
     },
     "p20": {
-      "status": "pending",
+      "status": "skipped",
       "attempts": 0
     },
     "p21": {
@@ -130,11 +130,11 @@
       "attempts": 0
     },
     "p22": {
-      "status": "pending",
+      "status": "skipped",
       "attempts": 0
     },
     "p23": {
-      "status": "pending",
+      "status": "skipped",
       "attempts": 0
     },
     "p24": {
@@ -145,7 +145,7 @@
       "finishedAt": "2026-09-26T20:48:25.700Z"
     },
     "p25": {
-      "status": "pending",
+      "status": "skipped",
       "attempts": 0
     },
     "p26": {
@@ -654,6 +654,45 @@
         "startedAt=now",
         "agent=a6bcfd7a397099b2f"
       ]
+    },
+    {
+      "at": "2026-09-26T21:56:59.737Z",
+      "id": "p19",
+      "set": [
+        "status=skipped"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:56:59.901Z",
+      "id": "p20",
+      "set": [
+        "status=skipped"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:56:59.984Z",
+      "id": "p22",
+      "set": [
+        "status=skipped"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:57:00.033Z",
+      "id": "p23",
+      "set": [
+        "status=skipped"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:57:00.083Z",
+      "id": "p25",
+      "set": [
+        "status=skipped"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:57:00.131Z",
+      "note": "User change of plan (21:56): finish the 7 running (p08,p10,p12,p13,p14,p15,p17); start only p21 and p18 as slots free up; p19,p20,p22,p23,p25 skipped by choice (not started)."
     }
   ]
 }
