@@ -15,10 +15,11 @@
       "agent": "aeba0235e5c5c2715"
     },
     "p03": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.095Z",
-      "agent": "a51c912ce828227f8"
+      "agent": "a51c912ce828227f8",
+      "finishedAt": "2026-09-26T21:16:04.847Z"
     },
     "p04": {
       "status": "running",
@@ -498,6 +499,14 @@
         "attempts=1",
         "startedAt=now",
         "agent=ab8cbdf9993893230"
+      ]
+    },
+    {
+      "at": "2026-09-26T21:16:04.847Z",
+      "id": "p03",
+      "set": [
+        "status=completed",
+        "finishedAt=now"
       ]
     }
   ]
