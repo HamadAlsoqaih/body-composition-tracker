@@ -197,4 +197,23 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .activity.on { border-color:#5aa9e6; background:#12202c; }
 .activity .fac { float:right; color:var(--dim); font-size:12px; }
 .ignoredlist { margin-top:10px; }
+
+.wn-card { position:relative; padding-top:22px; color:var(--txt); outline:none; }
+.wn-close { position:absolute; top:14px; right:14px; }
+.wn-card .wtitle { margin-right:36px; text-align:left; font-size:23px; }
+.wn-card .wlead { text-align:left; margin-bottom:16px; color:#aab3bf; }
+.wn-list { list-style:none; padding:0; margin:0 0 16px; }
+.wn-list .wfeat span { color:#aab3bf; }
+.wn-box { background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin-bottom:12px; font-size:13.5px; line-height:1.5; }
+.wn-box b { font-size:14.5px; }
+.wn-box p { margin:4px 0 0; color:#aab3bf; }
+.wn-secondary { margin-top:10px; background:#26303f; color:#fff; font-size:15px; padding:13px; }
+.wn-next { font-size:13.5px; line-height:1.5; color:#aab3bf; margin:4px 0 10px; }
+.wbtn:focus-visible, .wn-close:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+@media (max-width: 360px) {
+  .welcome { padding:10px; }
+  .welcomecard { padding:18px 14px calc(18px + env(safe-area-inset-bottom)); border-radius:20px; }
+  .wn-card .wtitle { font-size:20px; }
+  .wn-list .wfeat span, .wn-box { font-size:13px; }
+}
 `;

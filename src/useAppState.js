@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadState, saveState, requestPersistentStorage } from "./lib/storage.js";
 import { localDateString } from "./lib/dates.js";
 import * as food from "./lib/foodlog.js";
+import { WHATS_NEW_VERSION } from "./lib/whatsNew.js";
 
 function getStorage() {
   try {
@@ -91,8 +92,7 @@ export function useAppState() {
         }),
       replaceState: (next) => update(() => next),
       markBackup: (date) => update((s) => ({ ...s, meta: { ...s.meta, lastBackupAt: date } })),
-      dismissWhatsNew: () =>
-        update((s) => ({ ...s, meta: { ...s.meta, showWhatsNew: false }, settings: { ...s.settings, profilePrompted: true } })),
+      dismissWhatsNew: () => update((s) => ({ ...s, meta: { ...s.meta, whatsNewSeen: WHATS_NEW_VERSION } })),
       dismissBackupReminder: (date) => update((s) => ({ ...s, meta: { ...s.meta, backupReminderDismissedAt: date } })),
       clearCorrupt: (key) => {
         try {

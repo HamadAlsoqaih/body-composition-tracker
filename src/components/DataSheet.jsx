@@ -123,7 +123,7 @@ export default function DataSheet({ state, today, corrupt, persist, iosHint, onR
     if (!preview) return;
     const ok = confirm(mode === "replace" ? "Replace ALL current data with this backup? Export a backup of the current data first if you might need it." : "Merge this backup into your current data? Items already present are kept.");
     if (!ok) return;
-    const next = mode === "replace" ? { ...preview.state, meta: { ...preview.state.meta, persistRequested: state.meta.persistRequested } } : mergeStates(state, preview.state);
+    const next = mode === "replace" ? { ...preview.state, meta: { ...preview.state.meta, persistRequested: state.meta.persistRequested, whatsNewSeen: state.meta.whatsNewSeen } } : mergeStates(state, preview.state);
     onReplace(next);
     setPreview(null);
     setMsg(mode === "replace" ? "Backup restored." : "Backup merged.");

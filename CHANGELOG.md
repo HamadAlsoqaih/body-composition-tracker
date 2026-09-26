@@ -8,9 +8,13 @@
 - **Deploys ran without tests.** The GitHub Pages workflow now runs `npm test` after `npm ci` and before `npm run build`.
 - **Initial water variance ignored tuning.** The filter started the water state at a fixed 0.6² variance. It now starts at the water SD² in use (tuned or default) unless `initWVar` is passed explicitly. Default runs are unchanged (0.6² = 0.36).
 
-### New: one-time "What's new" popup
-- People who used an earlier version (their stored data is migrated and includes at least one weigh-in, measurement or food entry) see a one-time summary of the improvements that affect them. It replaces the first-run welcome for them, and offers "Review my profile" when the migrated profile may contain the old automatic defaults.
-- New users and old installs without any logged data don't see it. The flag is saved with the migrated data (so closing the tab before reading it doesn't lose it) and cleared for good when dismissed.
+### New: "What's new" popup (versioned)
+- People who already have logged data (at least one weigh-in, measurement or food entry) see a plain-language summary of the update once: smarter maintenance calories with a ± range, several meals per day, marking days complete, water-weight tags, body-fat-aware calculations, safer targets, backups and exports, and the time-zone date fix. It also explains that their maintenance number may differ from before and becomes more accurate after 2–4 weeks of daily weigh-ins and complete days.
+- A "Make a backup" button opens the backup screen.
+- Order: What's new first, then the one-time profile confirmation for existing users (the popup ends with "Next: confirm your profile" when that step is pending). Only one of these screens is shown at a time; after the backup screen closes, the profile step follows.
+- Versioned: the last dismissed release is stored as `meta.whatsNewSeen` (e.g. "2.1"), and the text lives in `src/content/whats-new.json`. A future update shows its own popup by replacing that content and raising its version. New users and old installs with empty data start as up to date and never see it; closing the app before dismissing keeps it pending.
+- Accessible: labelled modal dialog, focus moves into it and is trapped while open, closes with a ✕ button, "Done"/"Next" or Escape, scrolls on small phones (tested at 320 px wide), dark theme.
+- Tests render the app in jsdom (new devDependency) to check who sees it, the order with the profile step, the backup button, dismissal and focus handling.
 
 ### New: daily data export
 - `buildDailyExport(state, { from, to, includeEntries })` in `src/lib/export.js`: a readable day-by-day JSON file (always metric), with one object per date that has data and fields only where data exists. Format in the README.

@@ -20,6 +20,7 @@ import ChartSheet from "./components/ChartSheet.jsx";
 import BodyAnalysisSheet from "./components/BodyAnalysisSheet.jsx";
 import DataSheet from "./components/DataSheet.jsx";
 import WhatsNew from "./components/WhatsNew.jsx";
+import { onboardingStep, profileStepPending } from "./lib/whatsNew.js";
 
 const COMPOSITION = [
   { key: "weight", label: "Weight", kind: "mass", goodDir: "down" },
@@ -49,8 +50,11 @@ export default function App() {
 
   const [tab, setTab] = useState("body");
   const [baseMode, setBaseMode] = useState("first");
-  // returning users see "What's new" once (instead of the first-run welcome)
-  const [sheet, setSheet] = useState(() => (state.meta.showWhatsNew ? { type: "whatsnew" } : !settings.profilePrompted ? { type: "welcome" } : null));
+  // one onboarding screen at a time: What's new → profile (returning users) / welcome (new users)
+  const [sheet, setSheet] = useState(() => {
+    const step = onboardingStep(state);
+    return step ? { type: step } : null;
+  });
   const open = (type, extra = {}) => setSheet({ type, ...extra });
   const close = () => setSheet(null);
 
@@ -103,9 +107,16 @@ export default function App() {
 
       {sheet?.type === "whatsnew" && (
         <WhatsNew
-          needsProfile={settings.legacyReview || profileIncomplete}
-          onClose={() => { actions.dismissWhatsNew(); close(); }}
-          onReviewProfile={() => { actions.dismissWhatsNew(); open("profile"); }}
+          profileNext={profileStepPending(state)}
+          onDone={() => {
+            actions.dismissWhatsNew();
+            if (profileStepPending(state)) open("profile");
+            else close();
+          }}
+          onBackup={() => {
+            actions.dismissWhatsNew();
+            open("data", { then: profileStepPending(state) ? "profile" : null });
+          }}
         />
       )}
 
@@ -371,7 +382,7 @@ export default function App() {
       {sheet?.type === "chart" && <ChartSheet metric={sheet.metric} entries={entries} model={model} units={units} today={today} includeDates={settings.includeDates} onToggleInclude={actions.toggleInclude} onClose={close} />}
       {sheet?.type === "analysis" && <BodyAnalysisSheet entries={entries} cleanWeights={cleanWeights} navy={model.navy} units={units} today={today} onClose={close} />}
       {sheet?.type === "data" && (
-        <DataSheet state={state} today={today} corrupt={corrupt} persist={persist} iosHint={iosHint} onReplace={actions.replaceState} onMarkBackup={actions.markBackup} onClearCorrupt={actions.clearCorrupt} onClose={close} />
+        <DataSheet state={state} today={today} corrupt={corrupt} persist={persist} iosHint={iosHint} onReplace={actions.replaceState} onMarkBackup={actions.markBackup} onClearCorrupt={actions.clearCorrupt} onClose={() => (sheet.then ? open(sheet.then) : close())} />
       )}
 
       <nav className="bottombar">

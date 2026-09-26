@@ -4,6 +4,7 @@ import { isDateString, localDateString, daysBetween } from "./dates.js";
 import { nearestActivityLevel, BF_SOURCES } from "./energy.js";
 import { RATE_LIMITS } from "./targets.js";
 import { MACROS } from "./foodlog.js";
+import { initialWhatsNewSeen, isVersionString } from "./whatsNew.js";
 
 export const SCHEMA_VERSION = 3;
 export const KEYS = {
@@ -50,7 +51,7 @@ export const emptyState = () => ({
   days: {},
   settings: { ...DEFAULT_SETTINGS, units: { ...DEFAULT_SETTINGS.units }, includeDates: [] },
   goals: { weight: null, bodyFat: null },
-  meta: { createdAt: null, lastBackupAt: null, backupReminderDismissedAt: null, persistRequested: false, iosHintDismissed: false, showWhatsNew: false },
+  meta: { createdAt: null, lastBackupAt: null, backupReminderDismissedAt: null, persistRequested: false, iosHintDismissed: false, whatsNewSeen: null },
 });
 
 // ---------- safe storage primitives ----------
@@ -175,7 +176,7 @@ function sanitizeMeta(m) {
     backupReminderDismissedAt: isDateString(m.backupReminderDismissedAt) ? m.backupReminderDismissedAt : null,
     persistRequested: !!m.persistRequested,
     iosHintDismissed: !!m.iosHintDismissed,
-    showWhatsNew: !!m.showWhatsNew,
+    whatsNewSeen: isVersionString(m.whatsNewSeen) ? m.whatsNewSeen : null,
   };
 }
 
@@ -261,9 +262,9 @@ export function loadState(storage, today = localDateString()) {
   if (hadLegacy) safeSave(storage, version === 1 ? LEGACY_BACKUP_KEY : `bt_v${version}_backup`, { savedAt: today, entries: raw.entries ?? null, food: raw.food ?? null, settings: raw.settings ?? null, goals: raw.goals ?? null });
   const state = migrate(raw, today);
   if (!state.meta.createdAt) state.meta.createdAt = today;
-  // people who used an earlier version (and have data) get a one-time "What's new";
-  // the flag is saved with the migrated data and cleared when they dismiss it
-  if (hadLegacy && (state.entries.length > 0 || state.food.length > 0)) state.meta.showWhatsNew = true;
+  // "What's new": people with data keep an older/empty seen-version until they
+  // dismiss the notes; people starting with no data are marked as up to date
+  state.meta.whatsNewSeen = initialWhatsNewSeen(state);
   return { state, corrupt, errors, migratedFrom: hadLegacy ? version : null };
 }
 

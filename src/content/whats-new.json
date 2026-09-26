@@ -1,0 +1,53 @@
+{
+  "version": "2.1",
+  "title": "What's new in BodyTracker",
+  "intro": "We've rebuilt how BodyTracker works out your numbers. Everything you logged is still here.",
+  "items": [
+    {
+      "title": "Smarter maintenance calories",
+      "text": "Your daily calorie needs are now worked out from your own weight trend and food log, and shown with a range, like 2,950 ± 180 kcal. The range gets narrower as the app learns more about you."
+    },
+    {
+      "title": "Log every meal",
+      "text": "Add as many meals or snacks per day as you like, and edit or delete any of them."
+    },
+    {
+      "title": "Mark days complete",
+      "text": "Tap “Day complete” once you've logged everything you ate that day. Days you didn't finish logging are no longer counted as zero calories."
+    },
+    {
+      "title": "Tag water-weight days",
+      "text": "Mark days like a salty meal, travel, illness or your period, so short-term water weight isn't mistaken for real change."
+    },
+    {
+      "title": "Uses your body fat",
+      "text": "If you log body fat (smart scale, DEXA scan or calipers), your calorie needs and targets take it into account."
+    },
+    {
+      "title": "Safer targets",
+      "text": "Calorie targets never go below a sensible minimum, with extra care for under-18s, pregnancy or breastfeeding, and low body weight."
+    },
+    {
+      "title": "Backups and exports",
+      "text": "Save a backup and restore it later, export spreadsheets, or download your data day by day."
+    },
+    {
+      "title": "Dates fixed",
+      "text": "Anything you log late at night or just after midnight now goes on the right day, whatever your time zone."
+    }
+  ],
+  "expectation": {
+    "title": "Your maintenance number may change",
+    "text": "It may be different from what you saw before. That's expected: it's now based on your own data. It becomes more accurate after 2–4 weeks of weighing in daily and marking your food days complete."
+  },
+  "backup": {
+    "title": "Make a backup",
+    "text": "Your data is stored only on this device. Save a backup file now so you can restore it if your browser's storage is ever cleared.",
+    "button": "Make a backup"
+  },
+  "profileNext": {
+    "text": "Next, please check your height, age and activity level. Earlier versions filled in some of these automatically.",
+    "button": "Next: confirm your profile"
+  },
+  "doneButton": "Done"
+}
