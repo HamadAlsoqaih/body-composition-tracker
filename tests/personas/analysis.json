@@ -1,0 +1,126 @@
+{
+  "summary": {
+    "week4": {
+      "n": 0,
+      "medianAbsErr": null,
+      "p90AbsErr": null,
+      "medianAbsErrLoggingUnits": null,
+      "p90AbsErrLoggingUnits": null,
+      "coverage": null,
+      "coverageLoggingUnits": null
+    },
+    "week8": {
+      "n": 0,
+      "medianAbsErr": null,
+      "p90AbsErr": null,
+      "medianAbsErrLoggingUnits": null,
+      "p90AbsErrLoggingUnits": null,
+      "coverage": null,
+      "coverageLoggingUnits": null
+    },
+    "week12": {
+      "n": 0,
+      "medianAbsErr": null,
+      "p90AbsErr": null,
+      "medianAbsErrLoggingUnits": null,
+      "p90AbsErrLoggingUnits": null,
+      "coverage": null,
+      "coverageLoggingUnits": null
+    }
+  },
+  "personas": [
+    {
+      "id": "p01",
+      "name": "Khalid",
+      "weeks": [],
+      "firstMeasured": null,
+      "messages": [
+        {
+          "first": 1,
+          "text": "The math gives 1901 kcal/day, which is below the minimum this app will suggest (2140 kcal/day — the larger of your estimated BMR and 1,500 kcal). The target is set to 2140 kcal/day; expect slower progress than the chosen rate.",
+          "count": 2
+        },
+        {
+          "first": 1,
+          "text": "0 of the last 7 days are marked complete. Only complete days count as known intake — the estimate still works, just with a wider range.",
+          "count": 2
+        }
+      ],
+      "storage": {
+        "entries": 1,
+        "food": 0,
+        "meta": "{\"createdAt\":\"2026-10-04\",\"lastBackupAt\":null,\"backupReminderDismissedAt\":null,\"persistRequested\":true,\"iosHintDismissed\":true,\"whatsNewSeen\":\"2.1\",\"schemaVersion\":3}",
+        "settings": "{\"units\":{\"weight\":\"kg\",\"length\":\"cm\"},\"heightCm\":180,\"age\":34,\"sex\":\"male\",\"activity\":\"sedentary\",\"steps\":null,\"bf\":null,\"alreadyStable\":true,\"checkinWeekday\":0,\"goalDir\":\"lose\",\"ratePct\":null,\"proteinPerKg\":null,\"pregnant\":false,\"includeDates\":[],\"onboarded\":true,\"legacyReview\":false,\"profilePrompted\":true}"
+      },
+      "finalComposition": "BODY COMPOSITION Not enough data yet Tap for the full breakdown →",
+      "trueChange": {
+        "weight": -0.1,
+        "fm": 0,
+        "ffm": 0
+      },
+      "daysSimulated": 2
+    },
+    {
+      "id": "p04",
+      "name": "Faisal",
+      "weeks": [],
+      "firstMeasured": null,
+      "messages": [
+        {
+          "first": 1,
+          "text": "1 of the last 7 days are marked complete. Only complete days count as known intake — the estimate still works, just with a wider range.",
+          "count": 1
+        },
+        {
+          "first": 1,
+          "text": "Protein averaged 80 g on 1 logged day(s) vs a 99 g target.",
+          "count": 1
+        }
+      ],
+      "storage": {
+        "entries": 1,
+        "food": 4,
+        "meta": "{\"createdAt\":\"2026-10-04\",\"lastBackupAt\":null,\"backupReminderDismissedAt\":null,\"persistRequested\":true,\"iosHintDismissed\":true,\"whatsNewSeen\":\"2.1\",\"schemaVersion\":3}",
+        "settings": "{\"units\":{\"weight\":\"kg\",\"length\":\"cm\"},\"heightCm\":185,\"age\":19,\"sex\":\"male\",\"activity\":\"light\",\"steps\":null,\"bf\":null,\"alreadyStable\":true,\"checkinWeekday\":0,\"goalDir\":\"gain\",\"ratePct\":0.5,\"proteinPerKg\":null,\"pregnant\":false,\"includeDates\":[],\"onboarded\":true,\"legacyReview\":false,\"profilePrompted\":true}"
+      },
+      "finalComposition": "BODY COMPOSITION Not enough data yet Tap for the full breakdown →",
+      "trueChange": {
+        "weight": 0,
+        "fm": 0,
+        "ffm": 0
+      },
+      "daysSimulated": 1
+    },
+    {
+      "id": "p07",
+      "name": "Noura",
+      "weeks": [],
+      "firstMeasured": null,
+      "messages": [
+        {
+          "first": 1,
+          "text": "On iPhone/iPad, Safari can clear data for sites you haven't opened in 7 days. Add BodyTracker to your Home Screen (Share → Add to Home Screen) to keep your data safe. Got it",
+          "count": 1
+        },
+        {
+          "first": 1,
+          "text": "Profile needed for calorie estimates: height, age, sex used for the calculation, activity level, current-intake question, weekly check-in day. Complete profile",
+          "count": 1
+        }
+      ],
+      "storage": {
+        "entries": 0,
+        "food": 0,
+        "meta": "{\"createdAt\":\"2026-10-04\",\"lastBackupAt\":null,\"backupReminderDismissedAt\":null,\"persistRequested\":true,\"iosHintDismissed\":false,\"whatsNewSeen\":\"2.1\",\"schemaVersion\":3}",
+        "settings": "{\"units\":{\"weight\":\"kg\",\"length\":\"cm\"},\"heightCm\":null,\"age\":null,\"sex\":null,\"activity\":null,\"steps\":null,\"bf\":null,\"alreadyStable\":null,\"checkinWeekday\":null,\"goalDir\":\"maintain\",\"ratePct\":null,\"proteinPerKg\":null,\"pregnant\":false,\"includeDates\":[],\"onboarded\":false,\"legacyReview\":false,\"profilePrompted\":false}"
+      },
+      "finalComposition": null,
+      "trueChange": {
+        "weight": 0,
+        "fm": 0,
+        "ffm": 0
+      },
+      "daysSimulated": 1
+    }
+  ]
+}
