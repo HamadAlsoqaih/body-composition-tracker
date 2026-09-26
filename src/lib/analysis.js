@@ -10,7 +10,7 @@ import {
 } from "./targets.js";
 import { effectiveGoal, applyCalorieFloor, rapidLossWarning, validateGoalWeight, MSG } from "./guardrails.js";
 import { navyBodyFat } from "./composition.js";
-import { roundTo } from "./units.js";
+import { roundTo, fmtInt } from "./units.js";
 
 export const MIN_DAYS_FOR_STATUS = 14;
 
@@ -264,7 +264,7 @@ export function recommendation(m, fmtW = (kg) => `${kg.toFixed(2)} kg`) {
   if (!m.kalman) return { tone: "hold", text: m.reason };
   const t = m.targets;
   if (!t) return { tone: "hold", text: "Targets aren't available." };
-  const tgt = `${Math.round(t.target / 10) * 10} kcal/day`;
+  const tgt = `${fmtInt(roundTo(t.target, 10))} kcal/day`;
   if (!t.status) {
     return { tone: "hold", text: `Suggested intake: ${tgt}. An on-track check needs ${MIN_DAYS_FOR_STATUS} days of data (day ${m.snapshot.index + 1} so far).` };
   }
@@ -274,11 +274,11 @@ export function recommendation(m, fmtW = (kg) => `${kg.toFixed(2)} kg`) {
   if (t.status.onTrack) {
     return { tone: "hold", text: `On track. Your estimated rate (${range}) includes your target of ${wk(t.rateKgDay)}/week. Suggested intake: ${tgt}.` };
   }
-  const adj = Math.round(t.status.adjustKcal / 10) * 10;
+  const adj = roundTo(t.status.adjustKcal, 10);
   const dirWord = adj < 0 ? "less" : "more";
   return {
     tone: adj < 0 ? "cut" : "add",
-    text: `Your estimated rate (${range}) doesn't include your target of ${wk(t.rateKgDay)}/week. Eating about ${Math.abs(adj)} kcal/day ${dirWord} than recently would close the gap. Suggested intake: ${tgt}.`,
+    text: `Your estimated rate (${range}) doesn't include your target of ${wk(t.rateKgDay)}/week. Eating about ${fmtInt(Math.abs(adj))} kcal/day ${dirWord} than recently would close the gap. Suggested intake: ${tgt}.`,
   };
 }
 

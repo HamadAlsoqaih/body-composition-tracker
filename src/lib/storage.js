@@ -38,6 +38,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   includeDates: [], // un-ignored outlier days
   onboarded: false,
   legacyReview: false, // migrated profile needs a one-time check
+  profilePrompted: false, // the one-time profile prompt has been shown
 });
 
 export const emptyState = () => ({
@@ -47,7 +48,7 @@ export const emptyState = () => ({
   days: {},
   settings: { ...DEFAULT_SETTINGS, units: { ...DEFAULT_SETTINGS.units }, includeDates: [] },
   goals: { weight: null, bodyFat: null },
-  meta: { createdAt: null, lastBackupAt: null, backupReminderDismissedAt: null, persistRequested: false },
+  meta: { createdAt: null, lastBackupAt: null, backupReminderDismissedAt: null, persistRequested: false, iosHintDismissed: false },
 });
 
 // ---------- safe storage primitives ----------
@@ -149,6 +150,7 @@ export function sanitizeSettings(s) {
   out.includeDates = Array.isArray(s.includeDates) ? s.includeDates.filter(isDateString) : [];
   out.onboarded = !!s.onboarded;
   out.legacyReview = !!s.legacyReview;
+  out.profilePrompted = !!s.profilePrompted;
   return out;
 }
 
@@ -166,6 +168,7 @@ function sanitizeMeta(m) {
     lastBackupAt: isDateString(m.lastBackupAt) ? m.lastBackupAt : null,
     backupReminderDismissedAt: isDateString(m.backupReminderDismissedAt) ? m.backupReminderDismissedAt : null,
     persistRequested: !!m.persistRequested,
+    iosHintDismissed: !!m.iosHintDismissed,
   };
 }
 

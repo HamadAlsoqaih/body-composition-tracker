@@ -74,8 +74,3 @@ export function monthsBefore(date, months) {
   d.setDate(Math.min(day, lastDay));
   return localDateString(d);
 }
-
-/** Exact instant for a new entry (used only to order same-day weigh-ins). */
-export function nowTimestamp(d = new Date()) {
-  return d.toISOString();
-}
