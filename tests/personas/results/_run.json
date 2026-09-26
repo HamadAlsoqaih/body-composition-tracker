@@ -13,118 +13,119 @@
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.491Z",
       "agent": "aeba0235e5c5c2715",
-      "finishedAt": "2026-09-26T21:18:56.254Z"
+      "finishedAt": "2026-09-26T21:18:56.187Z"
     },
     "p03": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.095Z",
       "agent": "a51c912ce828227f8",
-      "finishedAt": "2026-09-26T21:16:04.847Z"
+      "finishedAt": "2026-09-26T21:16:04.783Z"
     },
     "p04": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:11:41.252Z",
       "agent": "a35c5d113cef37a6c",
-      "finishedAt": "2026-09-26T21:51:22.560Z"
+      "finishedAt": "2026-09-26T21:51:22.508Z"
     },
     "p05": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.536Z",
       "agent": "a59bc67b922a8337e",
-      "finishedAt": "2026-09-26T21:29:31.697Z"
+      "finishedAt": "2026-09-26T21:29:31.641Z"
     },
     "p06": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.143Z",
       "agent": "aa189a12f2e121c6d",
-      "finishedAt": "2026-09-26T21:24:39.632Z"
+      "finishedAt": "2026-09-26T21:24:39.555Z"
     },
     "p07": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:13:32.884Z",
       "agent": "ab8cbdf9993893230",
-      "finishedAt": "2026-09-26T21:45:21.792Z"
+      "finishedAt": "2026-09-26T21:45:21.721Z"
     },
     "p08": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:16:15.171Z",
       "agent": "ab86279d6ad07d67e",
-      "finishedAt": "2026-09-26T21:57:10.227Z"
+      "finishedAt": "2026-09-26T21:57:10.149Z"
     },
     "p09": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.190Z",
       "agent": "a7864ffef2d4ab28e",
-      "finishedAt": "2026-09-26T21:18:13.629Z"
+      "finishedAt": "2026-09-26T21:18:13.568Z"
     },
     "p10": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:18:33.113Z",
       "agent": "a30e34aee16dc58c9",
-      "finishedAt": "2026-09-26T22:05:41.890Z"
+      "finishedAt": "2026-09-26T22:05:41.819Z"
     },
     "p11": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.256Z",
       "agent": "a88a95c84f18b0291",
-      "finishedAt": "2026-09-26T21:10:47.776Z"
+      "finishedAt": "2026-09-26T21:10:17.769Z"
     },
     "p12": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:19:16.529Z",
       "agent": "ae03531b51a0f30d8",
-      "finishedAt": "2026-09-26T22:01:15.759Z"
+      "finishedAt": "2026-09-26T22:01:15.607Z"
     },
     "p13": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:24:50.139Z",
       "agent": "af7ddda87efbdee5e",
-      "finishedAt": "2026-09-26T22:08:03.295Z"
+      "finishedAt": "2026-09-26T22:08:03.220Z"
     },
     "p14": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:29:41.839Z",
       "agent": "aa2a9cf0d7119855e",
-      "finishedAt": "2026-09-26T22:08:53.614Z"
+      "finishedAt": "2026-09-26T22:08:53.555Z"
     },
     "p15": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:52:03.630Z",
       "agent": "a9c660e8962578acf",
-      "finishedAt": "2026-09-26T22:31:33.925Z"
+      "finishedAt": "2026-09-26T22:31:33.865Z"
     },
     "p16": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T20:29:54.307Z",
       "agent": "abfbe8f542cc246d2",
-      "finishedAt": "2026-09-26T21:13:01.832Z"
+      "finishedAt": "2026-09-26T21:13:01.755Z"
     },
     "p17": {
       "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T21:53:14.529Z",
       "agent": "a6bcfd7a397099b2f",
-      "finishedAt": "2026-09-26T22:35:39.704Z"
+      "finishedAt": "2026-09-26T22:35:39.653Z"
     },
     "p18": {
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "startedAt": "2026-09-26T22:01:25.391Z",
-      "agent": "adc2126c3ac9532fc"
+      "agent": "adc2126c3ac9532fc",
+      "finishedAt": "2026-09-26T22:41:46.033Z"
     },
     "p19": {
       "status": "skipped",
@@ -139,7 +140,7 @@
       "attempts": 1,
       "startedAt": "2026-09-26T21:57:20.025Z",
       "agent": "a9492abe1e1f71c99",
-      "finishedAt": "2026-09-26T22:38:59.815Z"
+      "finishedAt": "2026-09-26T22:38:59.762Z"
     },
     "p22": {
       "status": "skipped",
@@ -801,6 +802,18 @@
         "status=completed",
         "finishedAt=now"
       ]
+    },
+    {
+      "at": "2026-09-26T22:41:32.428Z",
+      "id": "p18",
+      "set": [
+        "status=completed",
+        "finishedAt=now"
+      ]
+    },
+    {
+      "at": "2026-09-26T22:50:00.000Z",
+      "note": "Re-ran finalize for all completed personas after the final-day scrape (days now counted as state.day+1). finishedAt restored to each persona's original finish time (from the first committed results file) after the re-run had overwritten it; finalize now keeps an existing finishedAt."
     }
   ]
 }

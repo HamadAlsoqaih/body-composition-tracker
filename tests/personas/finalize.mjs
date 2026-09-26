@@ -15,14 +15,14 @@ const state = fs.existsSync(statePath) ? JSON.parse(fs.readFileSync(statePath, "
 const reg = load();
 const entry = (reg.personas[id] ||= { status: "pending", attempts: 0 });
 entry.status = status;
-entry.finishedAt = new Date().toISOString();
+if (!entry.finishedAt || entry.status !== status || process.env.RESTAMP) entry.finishedAt = new Date().toISOString();
 if (err.length) entry.error = err.join(" ");
 save(reg);
 
 const result = {
   id, name: sim.PERSONAS[id].name, seed: sim.SEEDS[id], status, error: entry.error || null,
   attempts: entry.attempts, startedAt: entry.startedAt || null, finishedAt: entry.finishedAt,
-  daysSimulated: state ? state.day : 0, plannedDays: sim.PERSONAS[id].weeks * 7,
+  daysSimulated: state ? state.day + 1 : 0, plannedDays: sim.PERSONAS[id].weeks * 7,
   planHistory: state ? state.planHistory : [],
   truthStart: state ? state.truthLog[0] : null, truthEnd: state ? state.truthLog.at(-1) : null,
   analysis: analyze(id),
