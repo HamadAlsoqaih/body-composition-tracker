@@ -14,12 +14,12 @@ export const css = `
 .eyebrow { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); margin-bottom:4px; }
 h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .basetoggle { display:flex; background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:3px; }
-.basetoggle button { border:0; background:transparent; color:var(--dim); font-size:12px; font-weight:600; padding:6px 12px; border-radius:999px; }
+.basetoggle button { border:0; background:transparent; color:var(--dim); font-size:12px; font-weight:600; padding:6px 10px; border-radius:999px; }
 .basetoggle button.on { background:#26303f; color:#fff; }
 .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:8px; }
 .grid.tape { grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
 .sectlabel { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:26px 4px 12px; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:transform .12s, border-color .12s; min-width:0; }
+.card { color:var(--txt); background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:16px 8px 14px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; transition:transform .12s, border-color .12s; min-width:0; }
 .card:active { transform:scale(.97); border-color:#2e3a4d; }
 .ringwrap { position:relative; display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:1 / 1; }
 @supports not (aspect-ratio: 1 / 1) { .ringwrap { width:var(--ring-size); height:var(--ring-size); max-width:100%; } }
@@ -95,7 +95,7 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 .insight.good { border-color:#2c5a3f; }
 .insight.info .idot { background:#5aa9e6; }
 .insight.info { border-color:#2a4258; }
-.analysiscard { width:100%; text-align:left; border-radius:20px; padding:16px 18px; margin-bottom:14px; border:1px solid var(--line); background:var(--panel); }
+.analysiscard { color:var(--txt); width:100%; text-align:left; border-radius:20px; padding:16px 18px; margin-bottom:14px; border:1px solid var(--line); background:var(--panel); }
 .analysiscard[data-tone="good"] { border-color:#2c5a3f; background:linear-gradient(180deg,#16241d,#141922); }
 .analysiscard[data-tone="warn"] { border-color:#5a4a2b; background:linear-gradient(180deg,#241f16,#141922); }
 .analysiscard[data-tone="info"] { border-color:#2a4258; background:linear-gradient(180deg,#141f28,#141922); }
@@ -220,10 +220,10 @@ h1 { margin:0; font-size:30px; font-weight:650; letter-spacing:-.02em; }
 }
 
 @media (max-width: 400px) {
-  .eyebrow { letter-spacing:.1em; }
-  h1 { font-size:27px; }
-  .headright { gap:6px; }
+  .eyebrow { letter-spacing:.08em; }
+  h1 { font-size:26px; }
+  .headright { gap:5px; }
   .gear { width:34px; height:34px; }
-  .basetoggle button { padding:6px 8px; }
+  .basetoggle button { padding:6px 6px; font-size:11.5px; }
 }
 `;

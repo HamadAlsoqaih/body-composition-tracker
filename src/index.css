@@ -3,6 +3,17 @@
   padding: 0;
 }
 
+:root {
+  /* dark native controls: date/time pickers, selects, inputs, scrollbars */
+  color-scheme: dark;
+}
+
+/* buttons use the surrounding text colour and font, never the browser's default black */
+button {
+  color: inherit;
+  font: inherit;
+}
+
 html,
 body {
   background: #0b0e14;

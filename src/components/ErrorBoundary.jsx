@@ -33,8 +33,8 @@ export default class ErrorBoundary extends React.Component {
         <h2>Something went wrong</h2>
         <p style={{ color: "#8a94a2", lineHeight: 1.5 }}>Your data is still saved on this device. You can download a raw copy before reloading.</p>
         <p style={{ color: "#6b7480", fontSize: 12 }}>{String(this.state.error?.message || this.state.error)}</p>
-        <button onClick={this.downloadRaw} style={{ padding: "12px 16px", borderRadius: 12, border: 0, background: "#5aa9e6", marginRight: 8 }}>Download raw data</button>
-        <button onClick={() => location.reload()} style={{ padding: "12px 16px", borderRadius: 12, border: 0 }}>Reload</button>
+        <button onClick={this.downloadRaw} style={{ padding: "12px 16px", borderRadius: 12, border: 0, background: "#5aa9e6", color: "#06121e", marginRight: 8 }}>Download raw data</button>
+        <button onClick={() => location.reload()} style={{ padding: "12px 16px", borderRadius: 12, border: 0, background: "#26303f", color: "#fff" }}>Reload</button>
       </div>
     );
   }
