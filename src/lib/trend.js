@@ -61,10 +61,14 @@ export const MAD_TO_SD = 1.4826;
  */
 export function flagOutliers(daily, includeDates = []) {
   const keep = new Set(includeDates);
-  const devs = daily.map((p) => {
-    const win = daily.filter((q) => Math.abs(daysBetween(p.date, q.date)) <= 3).map((q) => q.weight);
-    if (win.length < 3) return { rollingMedian: null, dev: null };
-    const rm = median(win);
+  // day numbers once (daily is sorted by date), then a sliding ±3-day window
+  const day = daily.length ? daily.map((p) => daysBetween(daily[0].date, p.date)) : [];
+  let lo = 0, hi = 0;
+  const devs = daily.map((p, i) => {
+    while (day[lo] < day[i] - 3) lo++;
+    while (hi < daily.length && day[hi] <= day[i] + 3) hi++;
+    if (hi - lo < 3) return { rollingMedian: null, dev: null };
+    const rm = median(daily.slice(lo, hi).map((q) => q.weight));
     return { rollingMedian: rm, dev: p.weight - rm };
   });
   const ds = devs.filter((d) => d.dev != null).map((d) => d.dev);
